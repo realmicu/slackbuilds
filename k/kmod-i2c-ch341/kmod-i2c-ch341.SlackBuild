@@ -1,0 +1,74 @@
+#!/bin/sh
+# Set initial variables:
+CWD=$(pwd)
+
+MOD=i2c-ch341
+APP=kmod-${MOD}
+KERNSRC=/usr/src/linux
+VERSION=${VERSION:-$(echo $APP-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
+ARCH=${ARCH:-x86_64}
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+
+# run this with kernel configured/compiled!
+if [ ! -f ${KERNSRC}/include/config/kernel.release ] ; then
+  echo "Run 'make *config' then 'make modules_prepare' in kernel source dir first."
+  exit 1
+else
+  KERNVER=`cat ${KERNSRC}/include/config/kernel.release`
+fi
+
+MAKE="make"
+
+if [ "$TMP" = "" ]; then
+  TMP=/tmp
+fi
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG
+cd $TMP
+rm -rf $APP-$VERSION
+tar xvf $CWD/$APP-$VERSION.tar.?z*
+cd $APP-$VERSION
+chown -R root.root .
+find . -perm 444 -exec chmod 644 {} \;
+find . -perm 777 -exec chmod 755 {} \;
+find . -perm 666 -exec chmod 644 {} \;
+
+patch -p1 < $CWD/makefile-kern-ver.patch
+
+$MAKE KERN_VER=${KERNVER} || exit 1
+
+# install manually
+mkdir -p $PKG/lib/modules/${KERNVER}/misc/
+cp -v ${MOD}.ko $PKG/lib/modules/${KERNVER}/misc/ || exit 1
+chmod 644 $PKG/lib/modules/${KERNVER}/misc/${MOD}.ko && \
+chown root:root $PKG/lib/modules/${KERNVER}/misc/${MOD}.ko
+
+mkdir -p $PKG/install
+[ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh > $PKG/install/doinst.sh
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# update doinst.sh
+# (should be kept here due to $KERNVER)
+# ----------------
+cat << EOF >> $PKG/install/doinst.sh
+
+# A good idea whenever kernel modules are added or changed:
+if [ -x sbin/depmod ]; then
+  chroot . /sbin/depmod -a $KERNVER 1> /dev/null 2> /dev/null
+fi
+
+EOF
+# ----------------
+
+
+cd $PKG
+makepkg -l y -c n $TMP/$APP-${VERSION}_${KERNVER}-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/$APP-$VERSION
+  rm -rf $PKG
+fi
+

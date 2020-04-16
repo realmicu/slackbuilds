@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+        |-----handy-ruler------------------------------------------------------|
+litehtml: litehtml (fast and lightweight HTML/CSS rendering engine)
+litehtml:
+litehtml: litehtml is the lightweight HTML rendering engine with CSS2/CSS3
+litehtml: support. It can be used when you need to show HTML formatted text
+litehtml: or even to create a mini-browser.
+litehtml:
+litehtml: URL: http://www.litehtml.com/
+litehtml:
+litehtml:
+litehtml:
+litehtml:

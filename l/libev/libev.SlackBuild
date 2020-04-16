@@ -1,0 +1,140 @@
+#!/bin/sh
+# Set initial variables:
+CWD=$(pwd)
+
+APP=libev
+VERSION=$(ls $APP-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
+MARCH=${MARCH:-sandybridge}
+ARCH=${ARCH:-x86_64}
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+
+LIBSUFFIX=""
+
+if [ "$MARCH" = "i386" ]; then
+  SLKCFLAGS="-O2 -march=i386 -mtune=i686"
+elif [ "$MARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$MARCH" = "i586" ]; then
+  SLKCFLAGS="-O2 -march=i586 -mtune=i686"
+elif [ "$MARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686"
+elif [ "$MARCH" = "nocona" ]; then
+  SLKCFLAGS="-O2 -march=nocona -mtune=generic -mmmx -msse -msse2 -msse3"
+elif [ "$MARCH" = "core2" ]; then
+  SLKCFLAGS="-O2 -march=core2 -mtune=core2 -mmmx -msse -msse2 -msse3"
+elif [ "$MARCH" = "atom" ]; then
+  SLKCFLAGS="-O2 -march=core2 -mcx16 -msahf --param l1-cache-size=24 --param l1-cache-line-size=64 --param l2-cache-size=512 -mtune=core2 -mfpmath=sse -mmmx -msse -msse2 -msse3"
+elif [ "$MARCH" = "sandybridge" ]; then
+  SLKCFLAGS="-O2 -march=sandybridge"
+elif [ "$MARCH" = "pentium3" ]; then
+  SLKCFLAGS="-O2 -march=pentium3 -mmmx -msse"
+elif [ "$MARCH" = "pentium2" ]; then
+  SLKCFLAGS="-O2 -march=pentium2 -mmmx"
+elif [ "$MARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+else
+  SLKCFLAGS="-O2 -march=$ARCH"
+fi
+
+if [ "$ARCH" = "x86_64" ]; then
+  LIBSUFFIX=${LIBSUFFIX:-64}
+  SLKCFLAGS="$SLKCFLAGS -fPIC -m64"
+fi
+
+MAKE="make -j 5"
+
+if [ "$TMP" = "" ]; then
+  TMP=/tmp
+fi
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG
+cd $TMP
+rm -rf $APP-$VERSION
+tar xvf $CWD/$APP-$VERSION.tar.?z* || exit 1
+cd $APP-$VERSION || exit 1
+chown -R root.root .
+find . -perm 444 -exec chmod 644 {} \;
+find . -perm 777 -exec chmod 755 {} \;
+find . -perm 666 -exec chmod 644 {} \;
+
+# Force CFLAGS
+sed -i "s:-g -O3:$SLKCFLAGS:" configure || exit 1
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+	    --sysconfdir=/etc \
+	    --localstatedir=/var \
+	    --libdir=/usr/lib$LIBSUFFIX \
+	    --mandir=/usr/man \
+	    --docdir=/usr/doc/$APP-$VERSION \
+	    --enable-static=no \
+	    --build=$ARCH-slackware-linux || exit 1
+
+$MAKE || exit 1
+make install DESTDIR=$PKG || exit 1
+
+# Avoid conflicting with libevent, we move an header in a subfolder
+# and we will explicitly add CPPFLAGS="-I/usr/include/libev" when
+# building software depending on this, if needed: lighttpd2 and i3,
+# for example, don't need this header.
+mkdir -p $PKG/usr/include/libev
+mv $PKG/usr/include/event.h $PKG/usr/include/libev/
+
+# Don't ship .la files:
+rm -fv $PKG/{,usr/}lib${LIBSUFFIX}/*.la
+
+chown -R root.bin $PKG/usr/bin
+
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "current ar archive" | grep ELF | cut -f 1 -d : | xargs strip -g 2> /dev/null
+)
+
+# Compress and if needed symlink the man pages:
+if [ -d $PKG/usr/info ]; then
+  rm -f $PKG/usr/info/dir
+  gzip -9 $PKG/usr/info/*
+fi
+if [ -d $PKG/usr/man ]; then
+  ( cd $PKG/usr/man
+    for manpagedir in $(find . -type d -name "man*") ; do
+      ( cd $manpagedir
+        for eachpage in $( find . -type l -maxdepth 1) ; do
+          ln -s $( readlink $eachpage ).gz $eachpage.gz
+          rm $eachpage
+        done
+        gzip -9 *.?
+      )
+    done
+  )
+fi
+
+mkdir -p $PKG/usr/doc/$APP-$VERSION
+cp -a Changes LICENSE README TODO \
+  $PKG/usr/doc/$APP-$VERSION
+
+mkdir -p $PKG/install
+[ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh > $PKG/install/doinst.sh
+[ -f $CWD/doinst.sh.gz ] && zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
+
+cd $PKG
+makepkg -l y -c n $TMP/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/$APP-$VERSION
+  rm -rf $PKG
+fi
+

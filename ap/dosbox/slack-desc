@@ -1,0 +1,17 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+      |-----handy-ruler------------------------------------------------------|
+dosbox: dosbox (an x86 emulator with DOS)
+dosbox:
+dosbox: DOSBox is a DOS-emulator that uses the SDL-library. It also emulates
+dosbox: CPU:286/386 realmode/protected mode, Directory FileSystem/XMS/EMS,
+dosbox: Tandy/Hercules/CGA/EGA/VGA/VESA graphics, a SoundBlaster/Gravis
+dosbox: Ultra Sound card for excellent sound compatibility with older games.
+dosbox:
+dosbox: Homepage: http://www.dosbox.com/
+dosbox:

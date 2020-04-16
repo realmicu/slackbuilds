@@ -1,0 +1,17 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+                   |-----handy-ruler------------------------------------------------------|
+xfce4-genmon-plugin: xfce4-genmon-plugin (generic script/text file monitor for Xfce)
+xfce4-genmon-plugin:
+xfce4-genmon-plugin: This plugin cyclically spawns the indicated script/program, captures
+xfce4-genmon-plugin: its output (stdout) and displays the resulting string into the panel.
+xfce4-genmon-plugin: The string can also contain markup to displayed an image, a bar,
+xfce4-genmon-plugin: a button and a personalized tooltip.
+xfce4-genmon-plugin:
+xfce4-genmon-plugin: http://goodies.xfce.org/projects/panel-plugins/xfce4-genmon-plugin
+xfce4-genmon-plugin:

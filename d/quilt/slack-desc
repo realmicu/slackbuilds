@@ -1,0 +1,16 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+     |-----handy-ruler------------------------------------------------------|
+quilt: quilt (a collection of scripts for working with series of patches)
+quilt:
+quilt: The scripts allow to manage a series of patches by keeping
+quilt: track of the changes each patch makes. Patches can be
+quilt: applied, un-applied, refreshed, etc.
+quilt:
+quilt: URL: http://savannah.nongnu.org/projects/quilt
+quilt:

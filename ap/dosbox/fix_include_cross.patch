@@ -1,0 +1,10 @@
+--- ./include/cross.h.ORIG	2010-05-10 19:43:54.000000000 +0200
++++ ./include/cross.h	2016-08-17 22:26:35.124630118 +0200
+@@ -26,6 +26,7 @@
+ #endif
+ 
+ #include <stdio.h>
++#include <stddef.h>
+ #include <sys/stat.h>
+ #include <sys/types.h>
+ #include <string>

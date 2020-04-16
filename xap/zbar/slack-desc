@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+    |-----handy-ruler------------------------------------------------------|
+zbar: zbar (open source software suite for reading bar and QR codes)
+zbar:
+zbar: ZBar Bar Code Reader is an open source software suite for reading
+zbar: bar codes from various sources, such as video streams, image files
+zbar: and raw intensity sensors. It supports EAN-13/UPC-A, UPC-E, EAN-8,
+zbar: Code 128, Code 93, Code 39, Codabar, Interleaved 2 of 5, QR Code
+zbar: and SQ Code.
+zbar:
+zbar: Git: https://github.com/mchehab/zbar
+zbar:
+zbar:

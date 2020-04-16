@@ -1,0 +1,18 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+    |-----handy-ruler------------------------------------------------------|
+qemu: qemu (generic and open source machine emulator and virtualizer)
+qemu:
+qemu: QEMU is a generic and open source machine emulator and virtualizer.
+qemu: When used as a machine emulator, QEMU can run OSes and programs made
+qemu: for one machine on a different machine. When used as a virtualizer,
+qemu: QEMU achieves near native performance by executing the guest code
+qemu: directly on the host CPU.
+qemu:
+qemu: URL: https://www.qemu.org/
+qemu:

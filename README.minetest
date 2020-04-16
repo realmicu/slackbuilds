@@ -1,0 +1,8 @@
+
+Minetest packages (in build order):
+
+  d/luajit
+  l/irrlicht
+  xap/minetest		# contains both client and server
+  ap/minetest-server	# only if minetest package is not installed
+

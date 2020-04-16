@@ -1,0 +1,7 @@
+--- a/99-ch341a-prog.rules	2018-01-08 22:20:55.000000000 +0100
++++ b/99-ch341a-prog.rules	2018-01-08 22:25:24.032604897 +0100
+@@ -1,3 +1,3 @@
+ # udev rule that sets permissions for CH341A programmer in Linux.
+ # Put this file in /etc/udev/rules.d and reload udev rules or reboot to install
+-SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="5512", MODE="0666"
++SUBSYSTEM=="usb", ATTRS{idVendor}=="1a86", ATTRS{idProduct}=="5512", OWNER="root", GROUP="plugdev", MODE="0660"

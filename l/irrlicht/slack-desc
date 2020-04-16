@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+        |-----handy-ruler------------------------------------------------------|
+irrlicht: irrlicht (a free open source 3D engine)
+irrlicht:
+irrlicht: The Irrlicht Engine is an open source high performance realtime
+irrlicht: 3D engine written in C++. It is completely cross-platform,
+irrlicht: using D3D, OpenGL and its own software renderers, and has
+irrlicht: all of the state-of-the-art features which can be found in
+irrlicht: commercial 3d engines.
+irrlicht: This engine is used to build Minetest.
+irrlicht:
+irrlicht: URL: http://irrlicht.sourceforge.net/
+irrlicht:

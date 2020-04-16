@@ -1,0 +1,16 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+                        |-----handy-ruler------------------------------------------------------|
+xfce4-whiskermenu-plugin: xfce4-whiskermenu-plugin (alternate application launcher for Xfce)
+xfce4-whiskermenu-plugin:
+xfce4-whiskermenu-plugin: Whisker Menu is an alternate application launcher for Xfce.
+xfce4-whiskermenu-plugin: It organizes applications into categories, supports
+xfce4-whiskermenu-plugin: favourites list and has search box for quick navigation.
+xfce4-whiskermenu-plugin:
+xfce4-whiskermenu-plugin: URL: http://gottcode.org/xfce4-whiskermenu-plugin/
+xfce4-whiskermenu-plugin:

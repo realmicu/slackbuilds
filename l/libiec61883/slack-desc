@@ -1,0 +1,15 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+           |-----handy-ruler------------------------------------------------------|
+libiec61883: libiec61883 (DV, MPEG-2 and audio streaming library)
+libiec61883:
+libiec61883: The libiec61883 library provides a higher level API
+libiec61883: for streaming DV, MPEG-2 and audio over Linux IEEE 1394.
+libiec61883:
+libiec61883: URL: http://www.kernel.org/pub/linux/libs/ieee1394/
+libiec61883:

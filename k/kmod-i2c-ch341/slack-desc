@@ -1,0 +1,15 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+              |-----handy-ruler------------------------------------------------------|
+kmod-i2c-ch341: kmod-i2c-ch341 (kernel driver for the CH341 USB-I2C adapter)
+kmod-i2c-ch341:
+kmod-i2c-ch341: This is the kernel module that enables access to I2C bus on
+kmod-i2c-ch341: CH341-based board plugged to USB port.
+kmod-i2c-ch341:
+kmod-i2c-ch341: Git: https://github.com/gmarco/i2c-ch341.git
+kmod-i2c-ch341:

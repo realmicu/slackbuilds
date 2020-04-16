@@ -1,0 +1,68 @@
+	l	libiec61883
+	l	libavc1394
+	l	libdv
+	l	libetpan			# claws-mail
+	l	libburnia
+	l	libspectrum			# fuse-emulator
+	d	quilt
+	a	dump
+	a	exfat
+	d	avr-binutils
+	d	avr-gcc
+	d	avr-libc
+	ap	avrdude
+	ap	ch341prog
+	ap	dcfldd
+	ap	dosbox
+	ap	dvgrab
+	ap	heimdall
+	ap	i2c-tools
+	ap	lame
+	ap	mkvtoolnix
+	l	virglrenderer			# qemu
+	l	gumbo-parser			# claws-mail
+	l	litehtml			# claws-mail
+	xap	claws-mail
+	xap	fuse-emulator
+	xap	galculator
+	xap	leafpad
+	xap	xfburn
+	xfce	xfce4-cpufreq-plugin
+	xfce	xfce4-cpugraph-plugin
+	xfce	xfce4-genmon-plugin
+	xfce	xfce4-whiskermenu-plugin
+	ap	flashrom
+	l	libhyphen
+	l	webkitgtk
+	ap	x264
+	d	luajit				# minetest
+	l	irrlicht			# minetest
+	xap	minetest
+	ap	minetest-server
+	xap	nodeboxeditor
+	ap	joystick
+	l	libxml++
+ 	d	ocaml				# coccinelle
+ 	d	ocaml-findlib			# coccinelle
+	d	coccinelle			# qemu
+ 	ap	qemu
+	l	SDL_gfx
+	d	yaml-cpp
+	xap	openxcom
+	l	libqrencode			# zbar
+	xap	zbar
+	l	libev				# i3wm
+	l	yajl				# i3wm
+	x	xcb-util-xrm			# i3wm
+	xap	dmenu				# i3wm
+	xap	rofi				# i3wm
+	d	perl-common-sense		# i3wm
+	d	perl-Types-Serialiser		# i3wm
+	d	perl-Canary-Stability		# i3wm
+	d	perl-JSON-XS			# i3wm
+	d	perl-AnyEvent			# i3wm
+	x	i3-gaps				# i3wm
+	l	confuse				# i3status
+	xap	i3status
+	xap	i3blocks
+	ap	vifm

@@ -1,0 +1,17 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+         |-----handy-ruler------------------------------------------------------|
+libburnia: libburnia (library for reading, mastering and writing optical media)
+libburnia:
+libburnia: libburnia is a project for reading, mastering and writing optical
+libburnia: discs. Currently it is comprised of libraries named libisofs, libburn,
+libburnia: libisoburn, a cdrecord emulator named cdrskin, and an integrated
+libburnia: multi-session tool named xorriso.
+libburnia:
+libburnia: URL: http://libburnia-project.org/
+libburnia:

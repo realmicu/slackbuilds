@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+        |-----handy-ruler------------------------------------------------------|
+minetest: minetest (an InfiniMiner/Minecraft inspired game)
+minetest:
+minetest: An open source voxel game engine. Play one of our many games,
+minetest: mod a game to your liking, make your own game, or play on
+minetest: a multiplayer server.
+minetest:
+minetest: URL: https://www.minetest.net/
+minetest:
+minetest:
+minetest:
+minetest:

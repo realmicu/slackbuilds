@@ -1,0 +1,13 @@
+diff --git a/Makefile b/Makefile
+index 90c516c..6989415 100644
+--- a/Makefile
++++ b/Makefile
+@@ -6,7 +6,7 @@ sharedir = $(prefix)/share
+ mandir = $(sharedir)/man
+ man1dir = $(mandir)/man1
+ 
+-CFLAGS=-std=gnu99 -Wall
++CFLAGS+=-std=gnu99 -Wall
+ $(PKG): main.c ch341a.c ch341a.h
+ 	gcc $(CFLAGS) ch341a.c main.c -o $(PKG)  -lusb-1.0
+ clean:

@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|'
+# on the right side marks the last column you can put a character in.  You must
+# make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':'.
+
+    |-----handy-ruler------------------------------------------------------|
+dump: dump (tools for backing up and restoring ext2/3/4 filesystems)
+dump:
+dump: The dump package contains both dump and restore. Dump examines files
+dump: in a filesystem, determines which ones need to be backed up, and
+dump: copies those files to a specified disk, tape or other storage medium.
+dump: The restore command performs the inverse function of dump; it can
+dump: restore a full backup of a filesystem. Subsequent incremental backups
+dump: can then be layered on top of the full backup. Single files and
+dump: directory subtrees may also be restored from full or partial backups.
+dump: Both static and dynamically-linked versions are included.
+dump:
