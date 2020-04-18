@@ -53,6 +53,7 @@
 	xap	zbar
 	l	libev				# i3wm
 	l	yajl				# i3wm
+	x	font-awesome			# i3wm
 	x	xcb-util-xrm			# i3wm
 	xap	dmenu				# i3wm
 	xap	rofi				# i3wm

@@ -1,0 +1,59 @@
+#!/bin/sh
+# Set initial variables:
+CWD=$(pwd)
+
+APP=font-awesome
+SRC=Font-Awesome
+VERSION=$(ls $SRC-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
+ARCH=${ARCH:-noarch}
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+
+if [ "$TMP" = "" ]; then
+  TMP=/tmp
+fi
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG
+cd $TMP
+rm -rf $SRC-$VERSION
+tar xvf $CWD/$SRC-$VERSION.tar.?z* || exit 1
+cd $SRC-$VERSION || exit 1
+chown -R root.root .
+find . -perm 444 -exec chmod 644 {} \;
+find . -perm 777 -exec chmod 755 {} \;
+find . -perm 666 -exec chmod 644 {} \;
+
+mkdir -p $PKG/usr/share/fonts/TTF
+cp -a fonts/fontawesome-webfont.ttf $PKG/usr/share/fonts/TTF/FontAwesome.ttf
+
+mkdir -p $PKG/usr/share/fonts/OTF
+cp -a fonts/FontAwesome.otf $PKG/usr/share/fonts/OTF/FontAwesome.otf
+
+chmod 644 $PKG/usr/share/fonts/?TF/FontAwesome.?tf
+
+mkdir -p $PKG/usr/doc/$APP-$VERSION
+cp -a CONTRIBUTING.md HELP-US-OUT.txt README.md \
+  $PKG/usr/doc/$APP-$VERSION
+
+mkdir -p $PKG/install
+[ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh > $PKG/install/doinst.sh
+[ -f $CWD/doinst.sh.gz ] && zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
+
+cd $PKG
+makepkg -l y -c n $TMP/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/$SRC-$VERSION
+  rm -rf $PKG
+fi
+

@@ -3,6 +3,7 @@ i3 window manager packages (in build order):
 
   l/libev
   l/yajl
+  x/font-awesome	# optional - iconic font
   x/xcb-util-xrm
   xap/dmenu		# optional - rofi is recommended
   xap/rofi

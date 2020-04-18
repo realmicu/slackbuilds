@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+            |-----handy-ruler------------------------------------------------------|
+font-awesome: font-awesome (Iconic font designed for Bootstrap)
+font-awesome:
+font-awesome: This font is usually used by i3 window manager components like i3bar.
+font-awesome:
+font-awesome: URL: https://fontawesome.com/
+font-awesome:
+font-awesome:
+font-awesome:
+font-awesome:
+font-awesome:
+font-awesome:
