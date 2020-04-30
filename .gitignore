@@ -11,4 +11,4 @@
 *.tar.xz
 *.tgz
 *.txz
-*/old
+old/
