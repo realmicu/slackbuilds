@@ -68,3 +68,4 @@
 	xap	i3blocks
 	ap	vifm
 	l	libslirp			# podman
+	l	libseccomp			# podman
