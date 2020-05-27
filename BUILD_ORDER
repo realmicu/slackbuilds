@@ -69,3 +69,4 @@
 	ap	vifm
 	l	libslirp			# podman
 	l	libseccomp			# podman
+	ap	slirp4netns			# podman
