@@ -71,3 +71,4 @@
 	l	libseccomp			# podman
 	ap	slirp4netns			# podman
 	ap	conmon				# podman
+	ap	go-md2man			# podman
