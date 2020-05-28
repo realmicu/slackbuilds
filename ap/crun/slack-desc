@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+    |-----handy-ruler------------------------------------------------------|
+crun: crun (fast and lightweight fully featured OCI runtime)
+crun:
+crun: A fast and low-memory footprint OCI Container Runtime fully written
+crun: in C. It aims to be also usable as a library that can be easily
+crun: included in programs without requiring an external process for
+crun: managing OCI containers. crun is faster than runc and has a much
+crun: lower memory footprint.
+crun:
+crun: URL: https://github.com/containers/crun
+crun:
+crun:
