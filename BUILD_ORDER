@@ -52,7 +52,7 @@
 	l	libqrencode			# zbar
 	xap	zbar
 	l	libev				# i3wm
-	l	yajl				# i3wm
+	l	yajl				# i3wm,podman
 	x	font-awesome			# i3wm
 	x	xcb-util-xrm			# i3wm
 	xap	dmenu				# i3wm
@@ -73,3 +73,4 @@
 	ap	conmon				# podman
 	ap	go-md2man			# podman
 	ap	crun				# podman
+	n	cni-plugins			# podman
