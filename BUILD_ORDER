@@ -74,3 +74,4 @@
 	ap	go-md2man			# podman
 	ap	crun				# podman
 	n	cni-plugins			# podman
+	ap	fuse-overlayfs			# podman
