@@ -1,0 +1,13 @@
+---------------------------------------
+How to run OpenWrt in podman containers
+---------------------------------------
+
+Running OpenWrt versions for containers, such as docker.io/openwrtorg/rootfs,
+with defaults podman parameters may result in errors. To avoid that, following
+command line options should be supplied to 'podman run':
+--dns=none --no-hosts=true --systemd=false
+
+Example:
+
+# podman run --dns=none --no-hosts=true --systemd=false -it docker.io/openwrtorg/rootfs
+

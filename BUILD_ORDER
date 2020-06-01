@@ -75,3 +75,4 @@
 	ap	crun				# podman
 	n	cni-plugins			# podman
 	ap	fuse-overlayfs			# podman
+	ap	podman
