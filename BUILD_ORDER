@@ -77,3 +77,4 @@
 	ap	fuse-overlayfs			# podman
 	ap	podman
 	ap	buildah
+	ap	skopeo
