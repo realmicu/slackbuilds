@@ -36,7 +36,7 @@ elif [ "$MARCH" = "s390" ]; then
 elif [ "$MARCH" = "armv7l" ]; then
   SLKCFLAGS="-O2 -mcpu=cortex-a53"
 else
-  SLKCFLAGS="-O2 -march=$ARCH"
+  SLKCFLAGS="-O2 -march=$MARCH"
 fi
 
 if [ "$ARCH" = "x86_64" ]; then

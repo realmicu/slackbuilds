@@ -32,7 +32,7 @@ elif [ "$MARCH" = "pentium3" ]; then
 elif [ "$MARCH" = "pentium2" ]; then
   SLKCFLAGS="-march=pentium2 -mmmx"
 else
-  SLKCFLAGS="-march=$ARCH"
+  SLKCFLAGS="-march=$MARCH"
 fi
 
 if [ "$ARCH" = "x86_64" ]; then
