@@ -4,7 +4,7 @@ CWD=$(pwd)
 
 APP=xcb-util-xrm
 VERSION=$(ls $APP-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
-MARCH=${MARCH:-sandybridge}
+MARCH=${MARCH:-native}
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1}
 TAG=${TAG:-micu}

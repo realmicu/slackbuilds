@@ -4,7 +4,7 @@ CWD=$(pwd)
 
 APP=libburnia
 VERSION=1.5.2			# general version
-MARCH=${MARCH:-sandybridge}
+MARCH=${MARCH:-native}
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
