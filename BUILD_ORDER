@@ -78,3 +78,4 @@
 	ap	podman
 	ap	buildah
 	ap	skopeo
+	n	nginx-ssl-mini

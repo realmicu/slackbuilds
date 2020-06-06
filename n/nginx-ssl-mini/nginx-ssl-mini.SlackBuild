@@ -1,0 +1,218 @@
+#!/bin/sh
+# Set initial variables:
+CWD=$(pwd)
+
+APP=nginx-ssl-mini
+SRC=nginx
+VERSION=$(ls $SRC-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
+MARCH=${MARCH:-native}
+ARCH=${ARCH:-x86_64}
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+
+LIBSUFFIX=""
+
+if [ "$MARCH" = "i386" ]; then
+  SLKCFLAGS="-O2 -march=i386 -mtune=i686"
+elif [ "$MARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$MARCH" = "i586" ]; then
+  SLKCFLAGS="-O2 -march=i586 -mtune=i686"
+elif [ "$MARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686"
+elif [ "$MARCH" = "nocona" ]; then
+  SLKCFLAGS="-O2 -march=nocona -mtune=generic -mmmx -msse -msse2 -msse3"
+elif [ "$MARCH" = "core2" ]; then
+  SLKCFLAGS="-O2 -march=core2 -mtune=core2 -mmmx -msse -msse2 -msse3"
+elif [ "$MARCH" = "atom" ]; then
+  SLKCFLAGS="-O2 -march=core2 -mcx16 -msahf --param l1-cache-size=24 --param l1-cache-line-size=64 --param l2-cache-size=512 -mtune=core2 -mfpmath=sse -mmmx -msse -msse2 -msse3"
+elif [ "$MARCH" = "sandybridge" ]; then
+  SLKCFLAGS="-O2 -march=sandybridge"
+elif [ "$MARCH" = "pentium3" ]; then
+  SLKCFLAGS="-O2 -march=pentium3 -mmmx -msse"
+elif [ "$MARCH" = "pentium2" ]; then
+  SLKCFLAGS="-O2 -march=pentium2 -mmmx"
+elif [ "$MARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+else
+  SLKCFLAGS="-O2 -march=$MARCH"
+fi
+
+if [ "$ARCH" = "x86_64" ]; then
+  LIBSUFFIX=${LIBSUFFIX:-64}
+  SLKCFLAGS="$SLKCFLAGS -fPIC -m64"
+fi
+
+MAKE="make -j 5"
+
+if [ "$TMP" = "" ]; then
+  TMP=/tmp
+fi
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG
+cd $TMP
+rm -rf $SRC-$VERSION
+tar xvf $CWD/$SRC-$VERSION.tar.?z* || exit 1
+cd $SRC-$VERSION || exit 1
+chown -R root.root .
+find . -perm 444 -exec chmod 644 {} \;
+find . -perm 777 -exec chmod 755 {} \;
+find . -perm 666 -exec chmod 644 {} \;
+
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure --prefix=/usr \
+	    --sbin-path=/usr/sbin/$SRC \
+	    --conf-path=/etc/$SRC/${SRC}.conf \
+	    --pid-path=/var/run/${SRC}.pid \
+	    --lock-path=/var/lock/subsys \
+	    --user=${NGINXUSER:=nobody} \
+	    --group=${NGINXGROUP:=nogroup} \
+	    --error-log-path=/var/log/$SRC/error.log \
+	    --http-log-path=/var/log/$SRC/access.log \
+	    --http-client-body-temp-path=/var/lib/$SRC/client_body \
+	    --http-proxy-temp-path=/var/lib/$SRC/proxy \
+	    --modules-path=/usr/lib$LIBSUFFIX/$SRC/modules \
+	    --with-threads \
+	    --with-file-aio \
+	    --with-select_module \
+	    --with-poll_module \
+	    --with-pcre \
+	    --with-pcre-jit \
+	    --with-libatomic \
+	    --with-http_ssl_module \
+	    --with-http_v2_module \
+	    --without-http_charset_module \
+	    --without-http_gzip_module \
+	    --without-http_ssi_module \
+	    --without-http_userid_module \
+	    --without-http_auth_basic_module \
+	    --without-http_mirror_module \
+	    --without-http_autoindex_module \
+	    --without-http_geo_module \
+	    --without-http_map_module \
+	    --without-http_split_clients_module \
+	    --without-http_referer_module \
+	    --without-http_fastcgi_module \
+	    --without-http_uwsgi_module \
+	    --without-http_scgi_module \
+	    --without-http_grpc_module \
+	    --without-http_memcached_module \
+	    --without-http_empty_gif_module \
+	    --without-http_browser_module \
+	    --without-http_upstream_hash_module \
+	    --without-http_upstream_ip_hash_module \
+	    --without-http_upstream_least_conn_module \
+	    --without-http_upstream_random_module \
+	    --without-http_upstream_keepalive_module \
+	    --without-http_upstream_zone_module \
+	    --without-mail_pop3_module \
+	    --without-mail_imap_module \
+	    --without-mail_smtp_module \
+	    --without-stream_limit_conn_module \
+	    --without-stream_access_module \
+	    --without-stream_geo_module \
+	    --without-stream_map_module \
+	    --without-stream_split_clients_module \
+	    --without-stream_return_module \
+	    --without-stream_upstream_hash_module \
+	    --without-stream_upstream_least_conn_module \
+	    --without-stream_upstream_random_module \
+	    --without-stream_upstream_zone_module \
+	    --build=$ARCH-slackware-linux || exit 1
+
+$MAKE || exit 1
+make install DESTDIR=$PKG INSTALLDIRS=vendor INSTALLVENDORMAN3DIR=/usr/man/man3 || exit 1
+
+# Man page:
+mkdir -p $PKG/usr/man/man8
+install -m 0644 objs/${SRC}.8 $PKG/usr/man/man8
+
+# WWW root:
+mkdir -p $PKG/var/www
+mv $PKG/usr/html $PKG/var/www
+sed -i -e '/root[ ]*html/s|html;|/var/www/&|' $PKG/etc/$SRC/${SRC}.conf
+
+# Add an init script:
+mkdir -p $PKG/etc/rc.d
+cat $CWD/rc.nginx > $PKG/etc/rc.d/rc.nginx.new
+
+# Logrotate:
+mkdir -p $PKG/etc/logrotate.d
+sed -e "s,@USER@,$NGINXUSER," -e "s,@GROUP@,$NGINXGROUP," $CWD/${SRC}.logrotate \
+  > $PKG/etc/logrotate.d/${SRC}.new
+
+# Set the permissions for the log directory:
+chown $NGINXUSER $PKG/var/log/$SRC
+chmod 750 $PKG/var/log/$SRC
+
+# Create server dirs:
+mkdir -p -m 750 $PKG/var/lib/nginx/client_body $PKG/var/lib/nginx/proxy
+chown $NGINXUSER $PKG/var/lib/nginx/client_body $PKG/var/lib/nginx/proxy
+
+# Cleanup:
+rmdir $PKG/var/run
+( cd $PKG/etc/nginx &&
+  rm -fv koi-* win-utf fastcgi* uwsgi* scgi*
+)
+
+# Don't clobber config files:
+mv $PKG/etc/$SRC/${SRC}.conf $PKG/etc/$SRC/${SRC}.conf.new
+mv $PKG/etc/$SRC/mime.types $PKG/etc/$SRC/mime.types.new
+
+# Don't ship .la files:
+rm -f $PKG/{,usr/}lib${LIBSUFFIX}/*.la
+
+chown -R root.bin $PKG/usr/bin $PKG/usr/sbin
+
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "current ar archive" | grep ELF | cut -f 1 -d : | xargs strip -g 2> /dev/null
+)
+
+# Compress and if needed symlink the man pages:
+if [ -d $PKG/usr/info ]; then
+  rm -f $PKG/usr/info/dir
+  gzip -9 $PKG/usr/info/*
+fi
+if [ -d $PKG/usr/man ]; then
+  ( cd $PKG/usr/man
+    for manpagedir in $(find . -type d -name "man*") ; do
+      ( cd $manpagedir
+        for eachpage in $( find . -type l -maxdepth 1) ; do
+          ln -s $( readlink $eachpage ).gz $eachpage.gz
+          rm $eachpage
+        done
+        gzip -9 *.?
+      )
+    done
+  )
+fi
+
+mkdir -p $PKG/usr/doc/$APP-$VERSION
+cp -a CHANGES LICENSE README \
+  $PKG/usr/doc/$APP-$VERSION
+
+mkdir -p $PKG/install
+[ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh > $PKG/install/doinst.sh
+[ -f $CWD/doinst.sh.gz ] && zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
+
+cd $PKG
+makepkg -l y -c n $TMP/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/$SRC-$VERSION
+  rm -rf $PKG
+fi
+
