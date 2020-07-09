@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+       |-----handy-ruler------------------------------------------------------|
+viking: viking (GPS data editor and analyzer)
+viking:
+viking: Viking is a free/open source program to manage GPS data.
+viking: You can import, plot and create tracks, routes and waypoints, show OSM
+viking: and other maps, see real-time GPS position, control items, etc.
+viking: Other advanced capabilities include Geotagging Images, generate Maps,
+viking: Upload and Download tracks from OSM, Routing from OSRM or Google,
+viking: Name Searches from OSM Nominatim or Google and more.
+viking: It is written in mainly in C with some C++ and uses the GTK+2 toolkit.
+viking:
+viking: URL: http://sourceforge.net/projects/viking/
