@@ -83,6 +83,7 @@ CXXFLAGS="$SLKCFLAGS" \
 	    --with-libatomic \
 	    --with-http_ssl_module \
 	    --with-http_v2_module \
+	    --with-http_sub_module \
 	    --without-http_charset_module \
 	    --without-http_gzip_module \
 	    --without-http_ssi_module \
