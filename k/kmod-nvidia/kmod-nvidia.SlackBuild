@@ -1,0 +1,85 @@
+#!/bin/sh
+# Set initial variables:
+CWD=$(pwd)
+
+APP=kmod-nvidia
+KERNSRC=/usr/src/linux
+BINDIST=NVIDIA-Linux-x86_64
+MODLIST="nvidia-drm.ko nvidia-modeset.ko nvidia.ko"
+VERSION=${VERSION:-$(echo ${BINDIST}-*.run | rev | cut -f 2- -d . | cut -f 1 -d - | rev)}
+ARCH=${ARCH:-x86_64}
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+
+# run this with kernel configured/compiled!
+if [ ! -f ${KERNSRC}/include/config/kernel.release ] ; then
+  echo "Run 'make *config' then 'make modules_prepare' in kernel source dir first."
+  exit 1
+else
+  KERNVER=$(cat ${KERNSRC}/include/config/kernel.release)
+fi
+
+MAKE="make -j 8"
+
+if [ "$TMP" = "" ]; then
+  TMP=/tmp
+fi
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG
+cd $TMP
+rm -rf $BINDIST-$VERSION
+$CWD/${BINDIST}-${VERSION}.run -x || exit 1
+cd $BINDIST-$VERSION || exit 1
+chown -R root.root .
+find . -perm 444 -exec chmod 644 {} \;
+find . -perm 777 -exec chmod 755 {} \;
+find . -perm 666 -exec chmod 644 {} \;
+
+patch -p1 < $CWD/kmod-nvidia-linux-5.8.patch || exit 1
+cd kernel || exit 1
+
+$MAKE NV_EXCLUDE_KERNEL_MODULES="nvidia-uvm " SYSSRC="/usr/src/linux-$KERNVER" || exit 1
+
+# install manually
+DESTDIR=$PKG/lib/modules/${KERNVER}/kernel/drivers/video
+mkdir -p $DESTDIR $PKG/etc/modprobe.d || exit 1
+cp -v $MODLIST $DESTDIR || exit 1
+cp -v $CWD/nvidia.conf $PKG/etc/modprobe.d/nvidia.conf.new || exit 1
+chmod 644 ${DESTDIR}/*.ko $PKG/etc/modprobe.d/*.conf.new && \
+chown root:root ${DESTDIR}/*.ko $PKG/etc/modprobe.d/*.conf.new
+
+mkdir -p $PKG/install
+[ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh > $PKG/install/doinst.sh
+[ -f $CWD/doinst.sh.gz ] && zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
+
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# update doinst.sh
+# (should be kept here due to $KERNVER)
+# ----------------
+cat << EOF >> $PKG/install/doinst.sh
+
+# A good idea whenever kernel modules are added or changed:
+if [ -x sbin/depmod ]; then
+  chroot . /sbin/depmod -a $KERNVER 1> /dev/null 2> /dev/null
+fi
+
+EOF
+# ----------------
+
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
+
+cd $PKG
+makepkg -l y -c n $TMP/$APP-${VERSION}_${KERNVER}-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/$BINDIST-$VERSION
+  rm -rf $PKG
+fi
