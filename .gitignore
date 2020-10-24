@@ -12,3 +12,4 @@
 *.tgz
 *.txz
 old/
+NVIDIA-Linux-x86_64-*.run
