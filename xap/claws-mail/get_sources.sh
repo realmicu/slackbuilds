@@ -1,6 +1,6 @@
 #!/bin/bash
 SRC=claws-mail
-VERSION=3.17.5
+VERSION=3.17.8
 set -x
 wget -O ${SRC}-${VERSION}.tar.xz -c "https://www.claws-mail.org/download.php?file=releases/${SRC}-${VERSION}.tar.xz"
 rm -rf themes && mkdir themes || exit 1
@@ -10,7 +10,7 @@ for i in A_Ducks_Claw \
   Fugue \
   Gnome \
   Tango_1.2.1 \
-  clawsola-0.2 \
+  clawsola-0.3 \
   elementary \
   gnome-brave; do
   wget -O themes/claws-mail-theme_${i}.tar.gz "https://www.claws-mail.org/download.php?file=themes/png/claws-mail-theme_${i}.tar.gz"
