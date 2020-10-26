@@ -14,7 +14,7 @@ if [ "$ARCH" = "x86_64" ]; then
   LIBSUFFIX=${LIBSUFFIX:-64}
 fi
 
-MAKE="make -j 5"
+MAKE="make -j 7"
 
 if [ "$TMP" = "" ]; then
   TMP=/tmp
@@ -47,6 +47,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       -DUSE_WOFF2=OFF \
       -DUSE_WPE_RENDERER=OFF \
       -DENABLE_BUBBLEWRAP_SANDBOX=OFF \
+      -DUSE_SYSTEMD=OFF \
       .. || exit 1
 
 $MAKE || exit 1
