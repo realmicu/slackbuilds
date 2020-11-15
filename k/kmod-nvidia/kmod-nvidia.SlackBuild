@@ -37,8 +37,6 @@ find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
 patch -p1 < $CWD/kmod-nvidia-linux-5.8.patch || exit 1
-patch -p1 < $CWD/kmod-nvidia-linux-5.9.patch || exit 1
-patch -p1 < $CWD/kmod-nvidia-remove-warn_on.patch || exit 1
 cd kernel || exit 1
 
 $MAKE NV_EXCLUDE_KERNEL_MODULES="nvidia-uvm " SYSSRC="/usr/src/linux-$KERNVER" || exit 1
