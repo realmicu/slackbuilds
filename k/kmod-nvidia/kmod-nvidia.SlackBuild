@@ -36,7 +36,10 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-patch -p1 < $CWD/kmod-nvidia-linux-5.8.patch || exit 1
+KPATCH=$CWD/kmod-nvidia-linux-${KERNVER%.*}.patch
+if [ -f $KPATCH ] ; then
+  patch -p1 < $KPATCH || exit 1
+fi
 cd kernel || exit 1
 
 $MAKE NV_EXCLUDE_KERNEL_MODULES="nvidia-uvm " SYSSRC="/usr/src/linux-$KERNVER" || exit 1
