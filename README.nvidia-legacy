@@ -1,0 +1,11 @@
+
+Nvidia legacy binary driver is included in this tree.
+It is split into two packages (listed in build order):
+
+  l/nvidia-driver
+  k/kmod-nvidia
+
+First package contains libraries, binaries, config files
+and X.org support - basically everything besides kernel
+integration. Second one is the kernel module itself.
+

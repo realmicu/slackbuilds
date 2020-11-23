@@ -1,6 +1,4 @@
 #!/bin/bash
-set -x
 BINDIST=NVIDIA-Linux-x86_64
-VERSION=390.138
-wget https://us.download.nvidia.com/XFree86/Linux-x86_64/${VERSION}/${BINDIST}-${VERSION}.run && \
-  chmod +x ${BINDIST}-${VERSION}.run
+SRC=$(ls ../../l/nvidia-driver/${BINDIST}-*.run 2>/dev/null | tail -1)
+[ ! -z "$SRC" ] && [ -s "$SRC" ] && ln -s $SRC .
