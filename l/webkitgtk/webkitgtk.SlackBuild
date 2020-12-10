@@ -31,6 +31,10 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
+# ensure backward compatibility with the latest version of icu:
+# http://linuxfromscratch.org/blfs/view/svn/x/webkitgtk.html
+echo 'add_compile_definitions("U_DEFINE_FALSE_AND_TRUE=1")' >> Source/WTF/wtf/CMakeLists.txt
+
 mkdir build && cd build || exit 1
 
 cmake -DCMAKE_BUILD_TYPE=Release \
@@ -40,6 +44,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_LIBDIR=/usr/lib${LIBSUFFIX} \
       -DCMAKE_INSTALL_LIBEXECDIR=/usr/libexec \
       -DCMAKE_INSTALL_MANDIR=/usr/man \
+      -DCMAKE_SKIP_RPATH=ON \
       -DPORT=GTK \
       -DENABLE_GEOLOCATION=OFF \
       -DUSE_GSTREAMER_GL=OFF \
@@ -48,6 +53,7 @@ cmake -DCMAKE_BUILD_TYPE=Release \
       -DUSE_WPE_RENDERER=OFF \
       -DENABLE_BUBBLEWRAP_SANDBOX=OFF \
       -DUSE_SYSTEMD=OFF \
+      -DENABLE_MINIBROWSER=ON \
       .. || exit 1
 
 $MAKE || exit 1
