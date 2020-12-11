@@ -74,6 +74,10 @@ CXXFLAGS="$SLKCFLAGS" \
 $MAKE || exit 1
 make install DESTDIR=$PKG || exit 1
 
+# Give kvm access to 'users' group:
+mkdir -p $PKG/etc/udev/rules.d
+cp $CWD/80-kvm.rules $PKG/etc/udev/rules.d/80-kvm.rules.new
+
 # Don't ship .la files:
 rm -f $PKG/{,usr/}lib${LIBSUFFIX}/*.la
 
