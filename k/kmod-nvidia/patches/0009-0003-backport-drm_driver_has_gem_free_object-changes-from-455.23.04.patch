@@ -1,0 +1,64 @@
+From 93b30cddc79bce670fc91d92f0c8ebba171428aa Mon Sep 17 00:00:00 2001
+From: Andreas Beckmann <anbe@debian.org>
+Date: Sat, 3 Oct 2020 00:58:27 +0200
+Subject: [PATCH 3/3] backport drm_driver_has_gem_free_object changes from
+ 455.23.04
+
+---
+ conftest.sh                  | 24 ++++++++++++++++++++++++
+ nvidia-drm/nvidia-drm-drv.c  |  2 ++
+ nvidia-drm/nvidia-drm.Kbuild |  1 +
+ 3 files changed, 27 insertions(+)
+
+--- a/conftest.sh
++++ b/conftest.sh
+@@ -4170,6 +4170,30 @@ compile_test() {
+ 
+         ;;
+ 
++        drm_driver_has_gem_free_object)
++            #
++            # Determine if the 'drm_driver' structure has a 'gem_free_object'
++            # function pointer.
++            #
++            # drm_driver::gem_free_object is removed by commit 1a9458aeb8eb
++            # ("drm: remove drm_driver::gem_free_object") in v5.9-rc1.
++            #
++            CODE="
++            #if defined(NV_DRM_DRMP_H_PRESENT)
++            #include <drm/drmP.h>
++            #endif
++
++            #if defined(NV_DRM_DRM_DRV_H_PRESENT)
++            #include <drm/drm_drv.h>
++            #endif
++
++            int conftest_drm_driver_has_gem_free_object(void) {
++                return offsetof(struct drm_driver, gem_free_object);
++            }"
++
++            compile_check_conftest "$CODE" "NV_DRM_DRIVER_HAS_GEM_FREE_OBJECT" "" "types"
++        ;;
++
+         vga_tryget)
+             #
+             # Determine if vga_tryget() is present
+--- a/nvidia-drm/nvidia-drm-drv.c
++++ b/nvidia-drm/nvidia-drm-drv.c
+@@ -677,7 +677,9 @@ static struct drm_driver nv_drm_driver =
+ #endif
+                                DRIVER_GEM  | DRIVER_RENDER,
+ 
++#if defined(NV_DRM_DRIVER_HAS_GEM_FREE_OBJECT)
+     .gem_free_object        = nv_drm_gem_free,
++#endif
+ 
+     .ioctls                 = nv_drm_ioctls,
+     .num_ioctls             = ARRAY_SIZE(nv_drm_ioctls),
+--- a/nvidia-drm/nvidia-drm.Kbuild
++++ b/nvidia-drm/nvidia-drm.Kbuild
+@@ -93,3 +93,4 @@ NV_CONFTEST_TYPE_COMPILE_TESTS += drm_ge
+ NV_CONFTEST_TYPE_COMPILE_TESTS += vm_fault_t
+ NV_CONFTEST_TYPE_COMPILE_TESTS += drm_gem_object_has_resv
+ NV_CONFTEST_TYPE_COMPILE_TESTS += mm_has_mmap_lock
++NV_CONFTEST_TYPE_COMPILE_TESTS += drm_driver_has_gem_free_object

@@ -1,0 +1,19 @@
+From cac9d5a9b336a4c75712107ec8a114a96ccbaca5 Mon Sep 17 00:00:00 2001
+From: Andreas Beckmann <anbe@debian.org>
+Date: Sat, 29 Aug 2020 22:53:56 +0200
+Subject: [PATCH 3/3] work around mmap_{sem=>lock} rename, uvm part
+
+---
+ nvidia-uvm/nvidia-uvm.Kbuild | 1 +
+ 1 file changed, 1 insertion(+)
+
+--- a/nvidia-uvm/nvidia-uvm.Kbuild
++++ b/nvidia-uvm/nvidia-uvm.Kbuild
+@@ -131,6 +131,7 @@ NV_CONFTEST_TYPE_COMPILE_TESTS += vm_ops
+ NV_CONFTEST_TYPE_COMPILE_TESTS += vm_fault_t
+ NV_CONFTEST_TYPE_COMPILE_TESTS += proc_ops
+ NV_CONFTEST_TYPE_COMPILE_TESTS += timeval
++NV_CONFTEST_TYPE_COMPILE_TESTS += mm_has_mmap_lock
+ NV_CONFTEST_TYPE_COMPILE_TESTS += pnv_npu2_init_context
+ NV_CONFTEST_TYPE_COMPILE_TESTS += kmem_cache_has_kobj_remove_work
+ NV_CONFTEST_TYPE_COMPILE_TESTS += sysfs_slab_unlink

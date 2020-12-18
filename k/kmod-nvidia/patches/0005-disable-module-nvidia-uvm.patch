@@ -1,0 +1,19 @@
+Author: Andreas Beckmann <anbe@debian.org>
+Description: HACK! disable building the nvidia-uvm module
+ FTBFS in Linux 5.8 with
+   FATAL: modpost: GPL-incompatible module nvidia-uvm.ko uses GPL-only symbol 'radix_tree_preloads'
+ 415.18 fixed this by switching the module license to "Dual MIT/GPL"
+Bug-Debian: https://bugs.debian.org/969085
+Forwarded: not-needed
+
+--- a/Makefile
++++ b/Makefile
+@@ -19,6 +19,8 @@ ifneq ($(KERNELRELEASE),)
+   include $(src)/Kbuild
+ else
+ 
++  NV_EXCLUDE_KERNEL_MODULES += nvidia-uvm
++
+   # Determine the location of the Linux kernel source tree, and of the
+   # kernel's output tree.  Use this to invoke Kbuild, and pass the paths
+   # to the source and output trees to NVIDIA's Kbuild file via

@@ -1,0 +1,67 @@
+From f513e87a969f04b55a41b814e1025abcf6b6f3a6 Mon Sep 17 00:00:00 2001
+From: Andreas Beckmann <anbe@debian.org>
+Date: Sat, 29 Aug 2020 00:23:41 +0200
+Subject: [PATCH 2/3] work around mmap_{sem=>lock} rename
+
+---
+ common/inc/nv-mm.h           |  4 ++++
+ conftest.sh                  | 18 ++++++++++++++++++
+ nvidia-drm/nvidia-drm.Kbuild |  1 +
+ nvidia/nvidia.Kbuild         |  1 +
+ 4 files changed, 24 insertions(+)
+
+--- a/common/inc/nv-mm.h
++++ b/common/inc/nv-mm.h
+@@ -213,4 +213,8 @@ typedef int vm_fault_t;
+     }
+ #endif // NV_VM_FAULT_PRESENT
+ 
++#if defined(NV_MM_HAS_MMAP_LOCK)
++#define mmap_sem mmap_lock
++#endif
++
+ #endif // __NV_MM_H__
+--- a/conftest.sh
++++ b/conftest.sh
+@@ -4114,6 +4114,24 @@ compile_test() {
+ 
+         ;;
+ 
++        mm_has_mmap_lock)
++            #
++            # Determine if the 'mm_struct' structure has a 'mmap_lock' field.
++            #
++            # Kernel commit da1c55f1b272 ("mmap locking API: rename mmap_sem
++            # to mmap_lock") replaced the field 'mmap_sem' by 'mmap_lock'
++            # in v5.8-rc1 (2020-06-08).
++            CODE="
++            #include <linux/mm_types.h>
++
++            int conftest_mm_has_mmap_lock(void) {
++                return offsetof(struct mm_struct, mmap_lock);
++            }"
++
++            compile_check_conftest "$CODE" "NV_MM_HAS_MMAP_LOCK" "" "types"
++
++        ;;
++
+     esac
+ }
+ 
+--- a/nvidia-drm/nvidia-drm.Kbuild
++++ b/nvidia-drm/nvidia-drm.Kbuild
+@@ -92,3 +92,4 @@ NV_CONFTEST_TYPE_COMPILE_TESTS += drm_dr
+ NV_CONFTEST_TYPE_COMPILE_TESTS += drm_gem_prime_export_has_dev_arg
+ NV_CONFTEST_TYPE_COMPILE_TESTS += vm_fault_t
+ NV_CONFTEST_TYPE_COMPILE_TESTS += drm_gem_object_has_resv
++NV_CONFTEST_TYPE_COMPILE_TESTS += mm_has_mmap_lock
+--- a/nvidia/nvidia.Kbuild
++++ b/nvidia/nvidia.Kbuild
+@@ -194,6 +194,7 @@ NV_CONFTEST_TYPE_COMPILE_TESTS += backli
+ NV_CONFTEST_TYPE_COMPILE_TESTS += proc_ops
+ NV_CONFTEST_TYPE_COMPILE_TESTS += vmalloc_has_pgprot_t_arg
+ NV_CONFTEST_TYPE_COMPILE_TESTS += timeval
++NV_CONFTEST_TYPE_COMPILE_TESTS += mm_has_mmap_lock
+ NV_CONFTEST_TYPE_COMPILE_TESTS += kmem_cache_has_kobj_remove_work
+ NV_CONFTEST_TYPE_COMPILE_TESTS += sysfs_slab_unlink
+ NV_CONFTEST_TYPE_COMPILE_TESTS += pci_dev_has_skip_bus_pm

@@ -3,7 +3,7 @@
 CWD=$(pwd)
 
 APP=kmod-nvidia
-KERNSRC=/usr/src/linux
+KERNSRC=${KERNSRC:-/usr/src/linux}
 BINDIST=NVIDIA-Linux-x86_64
 MODLIST="nvidia-drm.ko nvidia-modeset.ko nvidia.ko"
 VERSION=${VERSION:-$(echo ${BINDIST}-*.run | rev | cut -f 2- -d . | cut -f 1 -d - | rev)}
@@ -36,13 +36,14 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-KPATCH=$CWD/kmod-nvidia-linux-${KERNVER%.*}.patch
-if [ -f $KPATCH ] ; then
-  patch -p1 < $KPATCH || exit 1
-fi
 cd kernel || exit 1
 
-$MAKE NV_EXCLUDE_KERNEL_MODULES="nvidia-uvm " SYSSRC="/usr/src/linux-$KERNVER" || exit 1
+# Apply Debian patches:
+ls $CWD/patches/*.patch | while read p ; do
+  patch -p1 < $p || exit 1
+done
+
+$MAKE NV_EXCLUDE_KERNEL_MODULES="nvidia-uvm " SYSSRC="$KERNSRC" || exit 1
 
 # install manually
 DESTDIR=$PKG/lib/modules/${KERNVER}/kernel/drivers/video

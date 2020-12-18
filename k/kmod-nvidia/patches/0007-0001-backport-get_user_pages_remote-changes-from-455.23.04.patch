@@ -1,0 +1,169 @@
+From a6d5a2ab1f8b26fd5ba9ff8cd3c7c756a45714bb Mon Sep 17 00:00:00 2001
+From: Andreas Beckmann <anbe@debian.org>
+Date: Thu, 1 Oct 2020 23:58:28 +0200
+Subject: [PATCH 1/3] backport get_user_pages_remote changes from 455.23.04
+
+---
+ common/inc/nv-mm.h | 37 ++++++++++++++++++++++++++-----------
+ conftest.sh        | 46 ++++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 68 insertions(+), 15 deletions(-)
+
+--- a/common/inc/nv-mm.h
++++ b/common/inc/nv-mm.h
+@@ -98,11 +98,12 @@ typedef int vm_fault_t;
+     #endif
+ #endif
+ 
+-/* get_user_pages_remote() was added by:
+- *   2016 Feb 12: 1e9877902dc7e11d2be038371c6fbf2dfcd469d7
++/*
++ * get_user_pages_remote() was added by commit 1e9877902dc7
++ * ("mm/gup: Introduce get_user_pages_remote()") in v4.6 (2016-02-12).
+  *
+- * The very next commit (cde70140fed8429acf7a14e2e2cbd3e329036653)
+- * deprecated the 8-argument version of get_user_pages for the
++ * The very next commit cde70140fed8 ("mm/gup: Overload get_user_pages()
++ * functions") deprecated the 8-argument version of get_user_pages for the
+  * non-remote case (calling get_user_pages with current and current->mm).
+  *
+  * The guidelines are: call NV_GET_USER_PAGES_REMOTE if you need the 8-argument
+@@ -110,13 +111,23 @@ typedef int vm_fault_t;
+  * NV_GET_USER_PAGES if you are refering to current and current->mm.
+  *
+  * Note that get_user_pages_remote() requires the caller to hold a reference on
+- * the task_struct (if non-NULL) and the mm_struct. This will always be true
+- * when using current and current->mm. If the kernel passes the driver a vma
+- * via driver callback, the kernel holds a reference on vma->vm_mm over that
+- * callback.
++ * the task_struct (if non-NULL and if this API has tsk argument) and the mm_struct.
++ * This will always be true when using current and current->mm. If the kernel passes
++ * the driver a vma via driver callback, the kernel holds a reference on vma->vm_mm
++ * over that callback.
++ *
++ * get_user_pages_remote() write/force parameters were replaced
++ * with gup_flags by commit 9beae1ea8930 ("mm: replace get_user_pages_remote()
++ * write/force parameters with gup_flags") in v4.9 (2016-10-13).
++ *
++ * get_user_pages_remote() added 'locked' parameter by commit 5b56d49fc31d
++ * ("mm: add locked parameter to get_user_pages_remote()") in
++ * v4.10 (2016-12-14).
++ *
++ * get_user_pages_remote() removed 'tsk' parameter by
++ * commit 64019a2e467a ("mm/gup: remove task_struct pointer for
++ * all gup code") in v5.9-rc1 (2020-08-11).
+  *
+- * get_user_pages_remote() added 'locked' parameter
+- *   2016 Dec 14:5b56d49fc31dbb0487e14ead790fc81ca9fb2c99
+  */
+ 
+ #if defined(NV_GET_USER_PAGES_REMOTE_PRESENT)
+@@ -140,9 +151,13 @@ typedef int vm_fault_t;
+                 flags |= FOLL_FORCE;
+ 
+         #if defined(NV_GET_USER_PAGES_REMOTE_HAS_LOCKED_ARG)
+-
++            #if defined (NV_GET_USER_PAGES_REMOTE_HAS_TSK_ARG)
+                return get_user_pages_remote(tsk, mm, start, nr_pages, flags,
+                                             pages, vmas, NULL);
++            #else
++               return get_user_pages_remote(mm, start, nr_pages, flags,
++                                            pages, vmas, NULL);
++            #endif
+ 
+         #else
+ 
+--- a/conftest.sh
++++ b/conftest.sh
+@@ -3016,7 +3016,7 @@ compile_test() {
+         get_user_pages_remote)
+             #
+             # Determine if the function get_user_pages_remote() is
+-            # present and has write/force parameters.
++            # present and has write/force/locked/tsk parameters.
+             #
+             # get_user_pages_remote() was added by:
+             #   2016 Feb 12: 1e9877902dc7e11d2be038371c6fbf2dfcd469d7
+@@ -3029,6 +3029,10 @@ compile_test() {
+             # get_user_pages_remote() added 'locked' parameter
+             #   2016 Dec 14:5b56d49fc31dbb0487e14ead790fc81ca9fb2c99
+             #
++            # get_user_pages_remote() removed 'tsk' parameter by
++            # commit 64019a2e467a ("mm/gup: remove task_struct pointer for
++            # all gup code") in v5.9-rc1 (2020-08-11).
++            #
+             # conftest #1: check if get_user_pages_remote() is available
+             # return if not available.
+             # Fall through to conftest #2 if it is present
+@@ -3044,6 +3048,7 @@ compile_test() {
+ 
+             if [ -f conftest$$.o ]; then
+                 echo "#undef NV_GET_USER_PAGES_REMOTE_PRESENT" | append_conftest "functions"
++                echo "#undef NV_GET_USER_PAGES_REMOTE_HAS_TSK_ARG" | append_conftest "functions"
+                 echo "#undef NV_GET_USER_PAGES_REMOTE_HAS_WRITE_AND_FORCE_ARGS" | append_conftest "functions"
+                 echo "#undef NV_GET_USER_PAGES_REMOTE_HAS_LOCKED_ARG" | append_conftest "functions"
+                 rm -f conftest$$.o
+@@ -3071,14 +3076,20 @@ compile_test() {
+             rm -f conftest$$.c
+ 
+             if [ -f conftest$$.o ]; then
++                echo "#define NV_GET_USER_PAGES_REMOTE_HAS_TSK_ARG" | append_conftest "functions"
+                 echo "#define NV_GET_USER_PAGES_REMOTE_HAS_WRITE_AND_FORCE_ARGS" | append_conftest "functions"
+                 echo "#undef NV_GET_USER_PAGES_REMOTE_HAS_LOCKED_ARG" | append_conftest "functions"
+                 rm -f conftest$$.o
+                 return
+             fi
+ 
++            echo "#undef NV_GET_USER_PAGES_REMOTE_HAS_WRITE_AND_FORCE_ARGS" | append_conftest "functions"
++
++            #
+             # conftest #3: check if get_user_pages_remote() has locked argument
+-            
++            # Return if these arguments are present. Fall through to conftest #4
++            # if these args are absent.
++            #
+             echo "$CONFTEST_PREAMBLE
+             #include <linux/mm.h>
+             long get_user_pages_remote(struct task_struct *tsk,
+@@ -3096,13 +3107,40 @@ compile_test() {
+             rm -f conftest$$.c
+ 
+             if [ -f conftest$$.o ]; then
++                echo "#define NV_GET_USER_PAGES_REMOTE_HAS_TSK_ARG" | append_conftest "functions"
++                echo "#define NV_GET_USER_PAGES_REMOTE_HAS_LOCKED_ARG" | append_conftest "functions"
++                rm -f conftest$$.o
++                return
++            fi
++
++            #
++            # conftest #4: check if get_user_pages_remote() does not take
++            # tsk argument.
++            #
++            echo "$CONFTEST_PREAMBLE
++            #include <linux/mm.h>
++            long get_user_pages_remote(struct mm_struct *mm,
++                                       unsigned long start,
++                                       unsigned long nr_pages,
++                                       unsigned int gup_flags,
++                                       struct page **pages,
++                                       struct vm_area_struct **vmas,
++                                       int *locked) {
++                return 0;
++            }" > conftest$$.c
++
++            $CC $CFLAGS -c conftest$$.c > /dev/null 2>&1
++            rm -f conftest$$.c
++
++            if [ -f conftest$$.o ]; then
++                echo "#undef NV_GET_USER_PAGES_REMOTE_HAS_TSK_ARG" | append_conftest "functions"
+                 echo "#define NV_GET_USER_PAGES_REMOTE_HAS_LOCKED_ARG" | append_conftest "functions"
+                 rm -f conftest$$.o
+             else
++
++                echo "#define NV_GET_USER_PAGES_REMOTE_HAS_TSK_ARG" | append_conftest "functions"
+                 echo "#undef NV_GET_USER_PAGES_REMOTE_HAS_LOCKED_ARG" | append_conftest "functions"
+             fi
+-            echo "#undef NV_GET_USER_PAGES_REMOTE_HAS_WRITE_AND_FORCE_ARGS" | append_conftest "functions"
+-
+         ;;
+ 
+         usleep_range)
