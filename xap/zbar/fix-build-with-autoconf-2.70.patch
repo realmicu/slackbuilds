@@ -1,0 +1,33 @@
+From 92ace028aa455c1c5e3326f0ba56f07c5fd331e3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Jani=20V=C3=A4limaa?= <wally@mageia.org>
+Date: Sat, 24 Oct 2020 09:44:46 +0300
+Subject: [PATCH] Fix build with upcoming autoconf 2.70
+
+---
+ configure.ac | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 105da09..9373f2f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -656,7 +656,7 @@ AS_IF([test "x$with_qt" != "xno"],
+ 					    [with_qt="no"])])])
+ 
+ AS_IF([test "x$with_qt" != "xno"],
+-   AS_IF([test "x$with_qt5" != "xno"],
++   [AS_IF([test "x$with_qt5" != "xno"],
+     [AC_CHECK_PROGS(MOC, [moc-qt5 moc])
+      AC_MSG_NOTICE([using moc from $MOC])
+      QT_VERSION=`$PKG_CONFIG Qt5Gui --modversion`
+@@ -672,7 +672,7 @@ dnl -fPIC has no effect on Windows and breaks windres
+      QT_VERSION=`$PKG_CONFIG QtGui --modversion`
+      AC_MSG_NOTICE([using Qt version $QT_VERSION])
+      qt_pkgconfig_file="zbar-qt.pc"
+-     ]))
++     ])])
+ 
+ AM_CONDITIONAL([HAVE_QT], [test "x$with_qt" = "xyes"])
+ 
+-- 
+2.29.0
