@@ -1,5 +1,5 @@
 #!/bin/bash
 SRC=xfburn
-VERSION=0.5.5
+VERSION=0.6.2
 set -x
-wget -c http://archive.xfce.org/src/apps/xfburn/0.5/${SRC}-${VERSION}.tar.bz2
+wget -c http://archive.xfce.org/src/apps/xfburn/0.6/${SRC}-${VERSION}.tar.bz2
