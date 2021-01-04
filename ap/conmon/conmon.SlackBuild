@@ -103,7 +103,7 @@ fi
 
 mkdir -p $PKG/usr/doc/$APP-$VERSION
 cp -a CODE-OF-CONDUCT.md LICENSE README.md \
-  SECURITY.md VERSION changelog.txt install.md \
+  SECURITY.md VERSION changelog.txt \
   $PKG/usr/doc/$APP-$VERSION
 
 mkdir -p $PKG/install

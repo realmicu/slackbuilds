@@ -12,7 +12,7 @@ conmon: Conmon is a monitoring program and communication tool between a
 conmon: container  manager (like podman or CRI-O) and an OCI runtime (like
 conmon: runc or crun) for a single container.
 conmon:
-conmon: Site: https://github.com/containers/conmon
+conmon: Git: https://github.com/containers/conmon
 conmon:
 conmon:
 conmon:
