@@ -11,7 +11,7 @@ buildah:
 buildah: buildah facilitates building OCI container images, all without a
 buildah: daemon. It supports a bash-style invocation, as well as Dockerfiles.
 buildah:
-buildah: https://github.com/containers/buildah
+buildah: Git: https://github.com/containers/buildah
 buildah:
 buildah:
 buildah:

@@ -1,6 +1,6 @@
 #!/bin/bash
 SRC=buildah
-VERSION=1.14.9
+VERSION=1.18.0
 git clone -b master https://github.com/containers/${SRC}.git $SRC && \
   ( cd $SRC && git co v${VERSION} )
 mv $SRC ${SRC}-${VERSION}
