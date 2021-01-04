@@ -8,9 +8,9 @@
          |-----handy-ruler------------------------------------------------------|
 go-md2man: go-md2man (utility to generate man pages)
 go-md2man:
-go-md2man: Generates man pages from markdown
+go-md2man: Generates man pages from markdown.
 go-md2man:
-go-md2man: Site: https://github.com/cpuguy83/go-md2man
+go-md2man: Git: https://github.com/cpuguy83/go-md2man
 go-md2man:
 go-md2man:
 go-md2man:
