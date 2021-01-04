@@ -11,7 +11,7 @@ slirp4netns:
 slirp4netns: slirp4netns provides user-mode networking ("slirp") for unprivileged
 slirp4netns: network namespaces.
 slirp4netns:
-slirp4netns:
+slirp4netns: Git: https://github.com/rootless-containers/slirp4netns
 slirp4netns:
 slirp4netns:
 slirp4netns:
