@@ -41,11 +41,10 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-# For recent build, we need go version at least 1.13.xx;
-# gccgo is now 1.12.2, so let's spend some time and build a dedicated version
+# For recent build, we need go version at least 1.15.x;
+# gccgo is now 1.14.4, so let's spend some time and build a dedicated version
 # (or use the one already built there):
 GODEVDIR=$TMP/go-devel
-GODEVVER=1.13.11
 if [ ! -x $GODEVDIR/go/bin/go ]; then
   echo "Development go not found at $GODEVDIR, building it."
   mkdir -p $GODEVDIR
@@ -53,7 +52,6 @@ if [ ! -x $GODEVDIR/go/bin/go ]; then
   git clone https://go.googlesource.com/go
   export GOPATH=$GODEVDIR/go
   cd $GOPATH
-  git co go$GODEVVER
   cd src || exit 1
   ./all.bash || exit 1
   cd $TMP/$APP-$VERSION/src/$DOMAIN/$ORG/$REPONAME || exit 1
@@ -73,21 +71,22 @@ rmdir $PKG/usr/lib
 
 mkdir -p $PKG/etc/containers/secrets
 
-# use upstream's default seccomp policy
-cp seccomp.json $PKG/etc/containers/seccomp.json.new
 # use upstream config, but default to cgroupfs and crun
-sed -e 's/^cgroup_manager = "systemd"/cgroup_manager = "cgroupfs"/g' \
-  -e 's/^runtime = "runc"/runtime = "crun"/g' \
-  -e 's/^# events_logger = "journald"/events_logger = "file"/g' \
-  libpod.conf > $PKG/etc/containers/libpod.conf.new
+sed -e 's:^# cgroup_manager = "systemd":cgroup_manager = "cgroupfs":' \
+  -e 's:^# runtime = "runc":runtime = "crun":' \
+  -e 's:^# events_logger = "journald":events_logger = "file":' \
+  -e 's:^# seccomp_profile = "/usr/share/containers/seccomp.json":seccomp_profile = "/etc/containers/seccomp.json":' \
+  vendor/$DOMAIN/$ORG/common/pkg/config/containers.conf > $PKG/etc/containers/containers.conf.new
 # use upstream storage config, but default to overlayfs
-sed -e 's/^driver = ""/driver = "overlay"/' \
-  -e 's/^#mount_program = /mount_program = /' \
-  vendor/github.com/containers/storage/storage.conf > $PKG/etc/containers/storage.conf.new
+sed -e 's:^driver = "":driver = "overlay":' \
+  -e 's:^#mount_program = :mount_program = :' \
+  vendor/$DOMAIN/$ORG/storage/storage.conf > $PKG/etc/containers/storage.conf.new
 
-cp $CWD/registries.conf $PKG/etc/containers/registries.conf.new
-cp $CWD/mounts.conf $PKG/etc/containers/mounts.conf.new
-cp $CWD/policy.json $PKG/etc/containers/policy.json.new
+cp -v vendor/$DOMAIN/$ORG/common/pkg/seccomp/seccomp.json $PKG/etc/containers/seccomp.json.new
+cp -v $CWD/registries.conf $PKG/etc/containers/registries.conf.new
+cp -v $CWD/mounts.conf $PKG/etc/containers/mounts.conf.new
+cp -v $CWD/policy.json $PKG/etc/containers/policy.json.new
+mv -v $PKG/etc/cni/net.d/87-podman-bridge.conflist $PKG/etc/cni/net.d/87-podman-bridge.conflist.new
 
 # Make docker link:
 ( cd $PKG/usr/bin && ln -s podman docker )

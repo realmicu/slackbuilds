@@ -1,6 +1,6 @@
 #!/bin/bash
 SRC=libpod
-VERSION=1.9.3
+VERSION=2.2.1
 git clone -b master https://github.com/containers/${SRC}.git $SRC && \
   ( cd $SRC && git co v${VERSION} )
 mv $SRC ${SRC}-${VERSION}

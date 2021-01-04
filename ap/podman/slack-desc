@@ -13,7 +13,7 @@ podman: Container Pod concept popularized by Kubernetes. libpod also contains
 podman: a tool called podman for managing Pods, Containers, and Container
 podman: Images.
 podman:
-podman: Site: https://github.com/containers/libpod
+podman: Git: https://github.com/containers/libpod
 podman:
 podman:
 podman:
