@@ -8,9 +8,9 @@
               |-----handy-ruler------------------------------------------------------|
 fuse-overlayfs: fuse-overlayfs (non-root overlayfs+shiftfs)
 fuse-overlayfs:
-fuse-overlayfs: An implementation of overlay+shiftfs in FUSE for rootless containers
+fuse-overlayfs: An implementation of overlay+shiftfs in FUSE for rootless containers.
 fuse-overlayfs:
-fuse-overlayfs: Site: https://github.com/containers/fuse-overlayfs
+fuse-overlayfs: Git: https://github.com/containers/fuse-overlayfs
 fuse-overlayfs:
 fuse-overlayfs:
 fuse-overlayfs:
