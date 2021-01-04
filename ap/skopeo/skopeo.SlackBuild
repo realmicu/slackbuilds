@@ -40,11 +40,10 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-# For recent build, we need go version at least 1.13.xx;
-# gccgo is now 1.12.2, so let's spend some time and build a dedicated version
+# For recent build, we need go version at least 1.15.x;
+# gccgo is now 1.14.4, so let's spend some time and build a dedicated version
 # (or use the one already built there):
 GODEVDIR=$TMP/go-devel
-GODEVVER=1.13.11
 if [ ! -x $GODEVDIR/go/bin/go ]; then
   echo "Development go not found at $GODEVDIR, building it."
   mkdir -p $GODEVDIR
@@ -52,7 +51,6 @@ if [ ! -x $GODEVDIR/go/bin/go ]; then
   git clone https://go.googlesource.com/go
   export GOPATH=$GODEVDIR/go
   cd $GOPATH
-  git co go$GODEVVER
   cd src || exit 1
   ./all.bash || exit 1
   cd $TMP/$APP-$VERSION/src/$DOMAIN/$ORG/$REPONAME || exit 1
@@ -64,8 +62,8 @@ export PATH=$GODEVDIR/go/bin:$PATH
 # Point go to the location of the source tree
 export GOPATH="$TMP/$APP-$VERSION"
 
-make binary-local BUILDTAGS="containers_image_ostree_stub"
-make install DESTDIR="$PKG" MANINSTALLDIR="$PKG/usr/man"
+make bin/skopeo docs BUILDTAGS="containers_image_ostree_stub" || exit 1
+make install DESTDIR="$PKG" MANINSTALLDIR="$PKG/usr/man" || exit 1
 
 ( cd $PKG/etc/containers
   mv policy.json policy.json.new

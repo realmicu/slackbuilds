@@ -14,6 +14,6 @@ skopeo: images as well as the original Docker v2 images. It works with API V2
 skopeo: registries such as Docker registries, private registries, local
 skopeo: directories and local OCI-layout directories.
 skopeo:
-skopeo: Site: https://github.com/containers/skopeo
+skopeo: Git: https://github.com/containers/skopeo
 skopeo:
 skopeo:

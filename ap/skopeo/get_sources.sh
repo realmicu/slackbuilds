@@ -1,6 +1,6 @@
 #!/bin/bash
 SRC=skopeo
-VERSION=1.0.0
+VERSION=1.2.0
 git clone -b master https://github.com/containers/${SRC}.git $SRC && \
   ( cd $SRC && git co v${VERSION} )
 mv $SRC ${SRC}-${VERSION}
