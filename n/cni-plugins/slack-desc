@@ -10,7 +10,7 @@ cni-plugins: cni-plugins (plugins for Container Networking Interface)
 cni-plugins:
 cni-plugins: Container networking plugins for baseline functionality.
 cni-plugins:
-cni-plugins: Site: https://github.com/containernetworking/plugins
+cni-plugins: Git: https://github.com/containernetworking/plugins
 cni-plugins:
 cni-plugins:
 cni-plugins:
