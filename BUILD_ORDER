@@ -55,17 +55,17 @@
 	l	yajl				# i3wm,podman
 	x	font-awesome			# i3wm
 	x	xcb-util-xrm			# i3wm
-	xap	dmenu				# i3wm
-	xap	rofi				# i3wm
 	d	perl-common-sense		# i3wm
 	d	perl-Types-Serialiser		# i3wm
 	d	perl-Canary-Stability		# i3wm
 	d	perl-JSON-XS			# i3wm
 	d	perl-AnyEvent			# i3wm
-	x	i3-gaps				# i3wm
 	l	confuse				# i3status
-	xap	i3status
-	xap	i3blocks
+	i3	dmenu				# i3wm
+	i3	rofi				# i3wm
+	i3	i3-gaps				# i3wm
+	i3	i3status			# i3wm
+	i3	i3blocks			# i3wm
 	ap	vifm
 	l	libslirp			# podman
 	l	libseccomp			# podman

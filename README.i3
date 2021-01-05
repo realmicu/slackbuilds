@@ -5,17 +5,17 @@ i3 window manager packages (in build order):
   l/yajl
   x/font-awesome	# optional - iconic font
   x/xcb-util-xrm
-  xap/dmenu		# optional - rofi is recommended
-  xap/rofi
   d/perl-common-sense
   d/perl-Types-Serialiser
   d/perl-Canary-Stability
   d/perl-JSON-XS
   d/perl-AnyEvent
-  x/i3-gaps
   l/confuse
-  xap/i3status
-  xap/i3blocks
+  i3/dmenu		# optional - rofi is recommended
+  i3/rofi
+  i3/i3-gaps
+  i3/i3status
+  i3/i3blocks
 
 System-wide configuration is stored in /etc/i3/ directory.
 
