@@ -38,10 +38,12 @@ find . -perm 666 -exec chmod 644 {} \;
 
 cd kernel || exit 1
 
-# Apply Debian patches:
-ls $CWD/patches/*.patch | while read p ; do
-  patch -p1 < $p || exit 1
-done
+# Apply patches if present:
+if [ -d $CWD/patches ] ; then
+  ls $CWD/patches/*.patch | while read p ; do
+    patch -p1 < $p || exit 1
+  done
+fi
 
 $MAKE NV_EXCLUDE_KERNEL_MODULES="nvidia-uvm " SYSSRC="$KERNSRC" || exit 1
 
