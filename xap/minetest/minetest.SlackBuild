@@ -36,7 +36,9 @@ cmake . \
       -DRUN_IN_PLACE=FALSE \
       -DIRRLICHT_INCLUDE_DIR=/usr/include/irrlicht \
       -DCMAKE_INSTALL_PREFIX=/usr \
-      -DCUSTOM_MANDIR=/usr/man || exit 1
+      -DCUSTOM_MANDIR=/usr/man \
+      -DENABLE_GETTEXT=TRUE \
+      -DBUILD_CLIENT=TRUE || exit 1
 
 $MAKE || exit 1
 make install DESTDIR=$PKG || exit 1
