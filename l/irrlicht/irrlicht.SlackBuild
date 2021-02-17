@@ -32,6 +32,7 @@ find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
 # Build shared version:
+patch -p1 < $CWD/irrlicht-1.8.4-remove-sys-sysctl.h.patch || exit 1
 cd source/Irrlicht
 $MAKE sharedlib || exit 1
 cd ../..
