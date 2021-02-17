@@ -1,5 +1,5 @@
 #!/bin/bash
 SRC=xfce4-genmon-plugin
-VERSION=4.0.2
+VERSION=4.1.0
 set -x
-wget -c http://archive.xfce.org/src/panel-plugins/${SRC}/4.0/${SRC}-${VERSION}.tar.bz2
+wget -c http://archive.xfce.org/src/panel-plugins/${SRC}/4.1/${SRC}-${VERSION}.tar.bz2
