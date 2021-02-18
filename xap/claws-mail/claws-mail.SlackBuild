@@ -59,16 +59,18 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
+if [ -f configure ] ; then CONFIGURE=configure ; else CONFIGURE=autogen.sh ; fi
+
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
-./configure --prefix=/usr \
-	    --sysconfdir=/etc \
-	    --localstatedir=/var \
-	    --mandir=/usr/man \
-	    --libdir=/usr/lib$LIBSUFFIX \
-	    --docdir=/usr/doc/$APP-$VERSION \
-	    --disable-manual \
-	    --build=$ARCH-slackware-linux || exit 1
+./$CONFIGURE --prefix=/usr \
+	     --sysconfdir=/etc \
+	     --localstatedir=/var \
+	     --mandir=/usr/man \
+	     --libdir=/usr/lib$LIBSUFFIX \
+	     --docdir=/usr/doc/$APP-$VERSION \
+	     --disable-manual \
+	     --build=$ARCH-slackware-linux || exit 1
 
 $MAKE || exit 1
 make install DESTDIR=$PKG || exit 1
