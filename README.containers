@@ -1,6 +1,7 @@
 
 Container packages (in build order):
 
+  l/yajl
   l/libslirp
   l/libseccomp
   ap/slirp4netns
@@ -19,11 +20,11 @@ Build notes:
 
 Tools are configured to use crun binary, not default runc.
 
-Currently gccgo in slackware-current is at version 1.12.2, which is too old
-to build recent podman, buildah and skopeo. Because of this, each of 3 build
-scripts downloads and compiles go 1.13.11 (location is /tmp/go-devel) - if
-there is already go in this directory, it is reused. Therefore, to save time
-and energy, it is advised to keep /tmp/go-devel until last of container tools
-is built.
+Usually gccgo in slackware (even current) is at version too old to build
+recent podman, buildah and skopeo. Because of this, build scripts for
+these 3 tools fetch and compile development branch of go if none is
+already present in /tmp/go-devel - otherwise it is reused.
+Therefore, to save time and energy, it is advised to keep /tmp/go-devel
+until last of container tools is built. Then it can be safely deleted.
 
 Buildah binary version matches that of podman internal buildah module.
