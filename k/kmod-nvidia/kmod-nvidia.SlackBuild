@@ -36,14 +36,16 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-cd kernel || exit 1
-
 # Apply patches if present:
-if [ -d $CWD/patches ] ; then
-  ls $CWD/patches/*.patch | while read p ; do
+# (search path is patches/linux-X.Y/*.patch)
+KPATCHDIR=$CWD/patches/linux-${KERNVER%.*}
+if [ -d $KPATCHDIR ] ; then
+  ls $KPATCHDIR/*.patch 2>/dev/null | while read p ; do
     patch -p1 < $p || exit 1
   done
 fi
+
+cd kernel || exit 1
 
 $MAKE NV_EXCLUDE_KERNEL_MODULES="nvidia-uvm " SYSSRC="$KERNSRC" || exit 1
 
