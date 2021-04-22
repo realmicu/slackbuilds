@@ -1,0 +1,16 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+                  |-----handy-ruler------------------------------------------------------|
+xfce4-notes-plugin: xfce4-notes-plugin (notes plugin for the Xfce Panel)
+xfce4-notes-plugin:
+xfce4-notes-plugin: The notes plugin provides you a quick way to write down a todo list,
+xfce4-notes-plugin: to paste a piece of code, to leave a note to your friend,
+xfce4-notes-plugin: or whatever else you had like to do with a Post-It note.
+xfce4-notes-plugin:
+xfce4-notes-plugin: https://gitlab.xfce.org/panel-plugins/xfce4-notes-plugin
+xfce4-notes-plugin:
