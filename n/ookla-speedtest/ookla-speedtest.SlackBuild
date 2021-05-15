@@ -1,0 +1,51 @@
+#!/bin/sh
+# Set initial variables:
+CWD=$(pwd)
+
+APP=ookla-speedtest
+VERSION=$(ls $APP-*.t?z | rev | cut -d- -f3 | rev)
+ARCH=${ARCH:-x86_64}
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+
+if [ "$TMP" = "" ]; then
+  TMP=/tmp
+fi
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG
+cd $TMP
+rm -rf $APP-$VERSION
+mkdir $APP-$VERSION || exit 1
+cd $APP-$VERSION || exit 1
+tar xzf $CWD/$APP-$VERSION-$ARCH-linux.t?z || exit 1
+chown -R root.root .
+
+mkdir -p $PKG/usr/bin $PKG/usr/man/man5 $PKG/usr/doc/$APP-$VERSION
+cp -a speedtest $PKG/usr/bin
+chmod -v 755 $PKG/usr/bin/speedtest
+gzip -c9 speedtest.5 > $PKG/usr/man/man5/speedtest.5.gz
+cp -a speedtest.md $PKG/usr/doc/$APP-$VERSION
+chmod -v 644 $PKG/usr/man/man5/speedtest.5.gz $PKG/usr/doc/$APP-$VERSION/*
+
+mkdir -p $PKG/install
+[ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh > $PKG/install/doinst.sh
+[ -f $CWD/doinst.sh.gz ] && zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
+
+cd $PKG
+makepkg -l y -c n $TMP/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/$APP-$VERSION
+  rm -rf $PKG
+fi
+
