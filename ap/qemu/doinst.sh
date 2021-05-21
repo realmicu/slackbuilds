@@ -11,4 +11,4 @@ config() {
   # Otherwise, we leave the .new copy for the admin to consider...
 }
 
-config etc/udev/rules.d/80-kvm.rules.new
+config lib/udev/rules.d/65-kvm.rules.new
