@@ -45,6 +45,7 @@
  	d	ocaml				# coccinelle
  	d	ocaml-findlib			# coccinelle
 	d	coccinelle			# qemu
+	l	liburing
  	ap	qemu
 	l	SDL_gfx
 	d	yaml-cpp
