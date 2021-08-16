@@ -71,7 +71,10 @@ CXXFLAGS="$SLKCFLAGS" \
 	    --localstatedir=/var \
 	    --mandir=/usr/man \
 	    --libdir=/usr/lib$LIBSUFFIX \
-	    --disable-qt \
+	    --enable-qt5 \
+	    --disable-qt6 \
+	    --disable-gui \
+	    --disable-update-check \
 	    --with-boost \
 	    --build=$ARCH-slackware-linux || exit 1
 
