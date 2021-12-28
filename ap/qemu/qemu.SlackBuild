@@ -68,7 +68,6 @@ CXXFLAGS="$SLKCFLAGS" \
 	    --localstatedir=/var \
 	    --mandir=/usr/man \
 	    --infodir=/usr/info \
-	    --docdir=/usr/doc/${APP}-${VERSION} \
 	    --libdir=/usr/lib${LIBSUFFIX} \
 	    --audio-drv-list=alsa,pa || exit 1
 $MAKE || exit 1
@@ -110,9 +109,8 @@ if [ -d $PKG/usr/man ]; then
   )
 fi
 
-# Doc dir is created during installation:
-cp -a CODING_STYLE COPYING COPYING.* Changelog \
-  HACKING LICENSE MAINTAINERS README VERSION \
+mkdir -p $PKG/usr/doc/$APP-$VERSION
+cp -a COPYING COPYING.* LICENSE MAINTAINERS README.rst VERSION \
   $PKG/usr/doc/$APP-$VERSION
 
 mkdir -p $PKG/install
