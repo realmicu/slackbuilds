@@ -42,8 +42,6 @@ if [ "$ARCH" = "x86_64" ]; then
   SLKCFLAGS="$SLKCFLAGS -fPIC -m64"
 fi
 
-MAKE="make -j 5"
-
 if [ "$TMP" = "" ]; then
   TMP=/tmp
 fi
@@ -59,22 +57,17 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-./autogen.sh --enable-autotools || exit 1
-make distclean || exit 1
+meson build -Dc_args="$SLKCFLAGS" \
+	--buildtype=release \
+	--prefix=/usr \
+	--localstatedir=/var \
+	--sharedstatedir=/var/lib \
+	--mandir=man \
+	--infodir=info \
+	--libdir=lib$LIBSUFFIX || exit 1
 
-CFLAGS="$SLKCFLAGS -DNO_SDL_GLEXT" \
-CXXFLAGS="$SLKCFLAGS -DNO_SDL_GLEXT" \
-./configure --prefix=/usr \
-	    --sysconfdir=/etc \
-	    --localstatedir=/var \
-	    --libdir=/usr/lib$LIBSUFFIX \
-	    --mandir=/usr/man \
-	    --docdir=/usr/doc/$APP-$VERSION \
-	    --enable-autotools \
-	    --build=$ARCH-slackware-linux || exit 1
-
-$MAKE || exit 1
-make install DESTDIR=$PKG || exit 1
+ninja -C build || exit 1
+DESTDIR=$PKG ninja -C build install || exit 1
 
 # Don't ship .la files:
 rm -fv $PKG/{,usr/}lib${LIBSUFFIX}/*.la
