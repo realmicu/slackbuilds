@@ -42,7 +42,7 @@ if [ "$ARCH" = "x86_64" ]; then
   SLKCFLAGS="$SLKCFLAGS -fPIC -m64"
 fi
 
-MAKE="make -j 5"
+MAKE="make -j $(nproc)"
 
 if [ "$TMP" = "" ]; then
   TMP=/tmp
