@@ -1,7 +1,5 @@
 #!/bin/bash
 SRC=fuse-overlayfs
-git clone -b master https://github.com/containers/${SRC}.git $SRC
-VERSION=$(cd $SRC && git describe --tags --dirty | sed -e 's/v//' -e 's/-/_/g')
-mv $SRC ${SRC}-${VERSION}
-tar cf - ${SRC}-${VERSION} | xz -c9 > ${SRC}-${VERSION}.tar.xz
-[ -s ${SRC}-${VERSION}.tar.xz ] && rm -rf ${SRC}-${VERSION}
+VERSION=1.8
+set -x
+wget -c -O ${SRC}-${VERSION}.tar.gz https://github.com/containers/${SRC}/archive/refs/tags/v${VERSION}.tar.gz
