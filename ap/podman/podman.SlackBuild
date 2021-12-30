@@ -3,8 +3,7 @@
 CWD=$(pwd)
 
 APP=podman
-SRC=libpod
-VERSION=$(ls $SRC-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
+VERSION=$(ls $APP-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
@@ -14,7 +13,7 @@ DOMAIN=github.com
 # The name of the organization/owner of the package
 ORG=containers
 # The name of the repository
-REPONAME=$SRC
+REPONAME=$APP
 
 LIBSUFFIX=""
 OUTPUT=${OUTPUT:-/tmp}
@@ -33,18 +32,18 @@ cd $TMP || exit 1
 rm -rf $APP-$VERSION
 mkdir -p $APP-$VERSION/src/$DOMAIN/$ORG
 cd $APP-$VERSION/src/$DOMAIN/$ORG || exit 1
-tar xvf $CWD/$SRC-$VERSION.tar.?z* || exit 1
-mv $SRC-$VERSION $REPONAME
+tar xvf $CWD/$APP-$VERSION.tar.?z* || exit 1
+mv $APP-$VERSION $REPONAME
 cd $REPONAME || exit 1
 chown -R root.root .
 find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-# For recent build, we need go version at least 1.15.x;
-# gccgo is now 1.14.4, so let's spend some time and build a dedicated version
-# (or use the one already built there):
-GODEVDIR=$TMP/go-devel
+# Fresh build usually requires very recent 'go' version, newer than
+# system (gcc)go. So let's be brave, invest some time and build
+# a dedicated environment (or use the one already built there):
+GODEVDIR=${GODEVDIR:-$TMP/go-devel}
 if [ ! -x $GODEVDIR/go/bin/go ]; then
   echo "Development go not found at $GODEVDIR, building it."
   mkdir -p $GODEVDIR
@@ -63,30 +62,26 @@ export PATH=$GODEVDIR/go/bin:$PATH
 # Point go to the location of the source tree
 export GOPATH="$TMP/$APP-$VERSION"
 
-make binaries PREFIX="/usr/" MANDIR="/usr/man/" || exit 1
-make install install.completions DESTDIR="$PKG" PREFIX="/usr/" MANDIR="/usr/man/" || exit 1
+make binaries PREFIX="/usr" ETCDIR="/etc" MANDIR="/usr/man" || exit 1
+make install install.completions DESTDIR="$PKG" PREFIX="/usr" ETCDIR="/etc" MANDIR="/usr/man" || exit 1
 
 rm -rf $PKG/usr/lib/systemd $PKG/usr/lib/tmpfiles.d
 rmdir $PKG/usr/lib
 
-mkdir -p $PKG/etc/containers/secrets
+mkdir -p $PKG/etc/containers $PKG/etc/cni/net.d $PKG/etc/modprobe.d
 
-# use upstream config, but default to cgroupfs and crun
-sed -e 's:^# cgroup_manager = "systemd":cgroup_manager = "cgroupfs":' \
-  -e 's:^# runtime = "runc":runtime = "crun":' \
-  -e 's:^# events_logger = "journald":events_logger = "file":' \
-  -e 's:^# seccomp_profile = "/usr/share/containers/seccomp.json":seccomp_profile = "/etc/containers/seccomp.json":' \
+# use upstream config, but change some variables:
+sed -e 's:^#cgroup_manager = "systemd":cgroup_manager = "cgroupfs":' \
+  -e 's:^#events_logger = "journald":events_logger = "file":' \
+  -e 's:^#seccomp_profile = "/usr/share/containers/seccomp.json":seccomp_profile = "/etc/containers/seccomp.json":' \
   vendor/$DOMAIN/$ORG/common/pkg/config/containers.conf > $PKG/etc/containers/containers.conf.new
-# use upstream storage config, but default to overlayfs
-sed -e 's:^driver = "":driver = "overlay":' \
-  -e 's:^#mount_program = :mount_program = :' \
-  vendor/$DOMAIN/$ORG/storage/storage.conf > $PKG/etc/containers/storage.conf.new
 
+cp -v vendor/$DOMAIN/$ORG/storage/storage.conf $PKG/etc/containers/storage.conf.new
 cp -v vendor/$DOMAIN/$ORG/common/pkg/seccomp/seccomp.json $PKG/etc/containers/seccomp.json.new
 cp -v $CWD/registries.conf $PKG/etc/containers/registries.conf.new
-cp -v $CWD/mounts.conf $PKG/etc/containers/mounts.conf.new
 cp -v $CWD/policy.json $PKG/etc/containers/policy.json.new
-mv -v $PKG/etc/cni/net.d/87-podman-bridge.conflist $PKG/etc/cni/net.d/87-podman-bridge.conflist.new
+cp -v cni/87-podman-bridge.conflist $PKG/etc/cni/net.d/87-podman-bridge.conflist.new
+cp -v $CWD/modprobe_overlay.conf $PKG/etc/modprobe.d/overlay.conf.new
 
 # Make docker link:
 ( cd $PKG/usr/bin && ln -s podman docker )
@@ -122,7 +117,7 @@ if [ -d $PKG/usr/man ]; then
 fi
 
 mkdir -p $PKG/usr/doc/$APP-$VERSION
-cp -a LICENSE OWNERS changelog.txt *.md $CWD/OPENWRT-in-podman.txt \
+cp -a LICENSE OWNERS *.md $CWD/OPENWRT-in-podman.txt \
   $PKG/usr/doc/$APP-$VERSION
 
 mkdir -p $PKG/install
@@ -146,4 +141,3 @@ if [ "$1" = "--cleanup" ]; then
   rm -rf $PKG
   rm -rf $GODEVDIR
 fi
-

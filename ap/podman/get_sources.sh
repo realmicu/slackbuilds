@@ -1,8 +1,5 @@
 #!/bin/bash
-SRC=libpod
-VERSION=2.2.1
-git clone -b master https://github.com/containers/${SRC}.git $SRC && \
-  ( cd $SRC && git co v${VERSION} )
-mv $SRC ${SRC}-${VERSION}
-tar cf - ${SRC}-${VERSION} | xz -c9 > ${SRC}-${VERSION}.tar.xz
-[ -s ${SRC}-${VERSION}.tar.xz ] && rm -rf ${SRC}-${VERSION}
+SRC=podman
+VERSION=3.4.4
+set -x
+wget -c -O ${SRC}-${VERSION}.tar.gz https://github.com/containers/${SRC}/archive/refs/tags/v${VERSION}.tar.gz

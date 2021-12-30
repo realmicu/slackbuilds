@@ -13,8 +13,8 @@ config() {
 
 config etc/containers/containers.conf.new
 config etc/containers/registries.conf.new
-config etc/containers/mounts.conf.new
 config etc/containers/seccomp.json.new
 config etc/containers/policy.json.new
 config etc/containers/storage.conf.new
 config etc/cni/net.d/87-podman-bridge.conflist.new
+config etc/modprobe.d/overlay.conf.new
