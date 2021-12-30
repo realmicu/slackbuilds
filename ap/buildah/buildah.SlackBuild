@@ -40,10 +40,10 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-# For recent build, we need go version at least 1.15.x;
-# gccgo is now 1.14.4, so let's spend some time and build a dedicated version
-# (or use the one already built there):
-GODEVDIR=$TMP/go-devel
+# Fresh build usually requires very recent 'go' version, newer than
+# system (gcc)go. So let's be brave, invest some time and build
+# a dedicated environment (or use the one already built there):
+GODEVDIR=${GODEVDIR:-$TMP/go-devel}
 if [ ! -x $GODEVDIR/go/bin/go ]; then
   echo "Development go not found at $GODEVDIR, building it."
   mkdir -p $GODEVDIR
@@ -62,8 +62,8 @@ export PATH=$GODEVDIR/go/bin:$PATH
 # Point go to the location of the source tree
 export GOPATH="$TMP/$APP-$VERSION"
 
-make all PREFIX="/usr/" MANDIR="/usr/man/" TAGS="'seccomp containers_image_ostree_stub'" || exit 1
-make install install.completions DESTDIR="$PKG" PREFIX="/usr/" MANDIR="/usr/man/" || exit 1
+make all PREFIX="/usr" ETCDIR="/etc" MANDIR="/usr/man" TAGS="'seccomp containers_image_ostree_stub'" || exit 1
+make install install.completions DESTDIR="$PKG" PREFIX="/usr" ETCDIR="/etc" MANDIR="/usr/man" || exit 1
 
 # Change runtime:
 mkdir -p $PKG/etc/profile.d
