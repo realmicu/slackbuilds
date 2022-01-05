@@ -62,8 +62,8 @@ export PATH=$GODEVDIR/go/bin:$PATH
 # Point go to the location of the source tree
 export GOPATH="$TMP/$APP-$VERSION"
 
-make all PREFIX="/usr" ETCDIR="/etc" MANDIR="/usr/man" TAGS="'seccomp containers_image_ostree_stub'" || exit 1
-make install install.completions DESTDIR="$PKG" PREFIX="/usr" ETCDIR="/etc" MANDIR="/usr/man" || exit 1
+make all PREFIX="/usr" MANDIR="/usr/man" || exit 1
+make install install.completions DESTDIR="$PKG" PREFIX="/usr" MANDIR="/usr/man" || exit 1
 
 # Change runtime:
 mkdir -p $PKG/etc/profile.d
