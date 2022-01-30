@@ -1,0 +1,19 @@
+diff --color -ruN a/Makefile b/Makefile
+--- a/Makefile	2022-01-30 17:41:11.000000000 +0100
++++ b/Makefile	2022-01-30 17:43:20.944541879 +0100
+@@ -1,11 +1,8 @@
+ obj-m += i2c-ch341.o
++KERNSRC ?= /usr/src/linux
+ 
+ all:
+-		make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
++		make -C $(KERNSRC) M=$(PWD) modules
+ 
+ clean:
+-		make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+-
+-reload:	all
+-		sudo rmmod i2c-ch341 ||true
+-		sudo insmod ./i2c-ch341.ko 
+\ No newline at end of file
++		make -C $(KERNSRC) M=$(PWD) clean

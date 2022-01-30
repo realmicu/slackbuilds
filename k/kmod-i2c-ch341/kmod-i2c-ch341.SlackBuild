@@ -4,7 +4,7 @@ CWD=$(pwd)
 
 MOD=i2c-ch341
 APP=kmod-${MOD}
-KERNSRC=/usr/src/linux
+KERNSRC=${KERNSRC:-/usr/src/linux}
 VERSION=${VERSION:-$(echo $APP-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1}
@@ -15,7 +15,7 @@ if [ ! -f ${KERNSRC}/include/config/kernel.release ] ; then
   echo "Run 'make *config' then 'make modules_prepare' in kernel source dir first."
   exit 1
 else
-  KERNVER=`cat ${KERNSRC}/include/config/kernel.release`
+  KERNVER=$(cat ${KERNSRC}/include/config/kernel.release)
 fi
 
 MAKE="make"
@@ -35,9 +35,9 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-patch -p1 < $CWD/makefile-kern-ver.patch
+patch -p1 < $CWD/makefile-kernsrc.patch
 
-$MAKE KERN_VER=${KERNVER} || exit 1
+$MAKE KERNSRC=${KERNSRC} || exit 1
 
 # install manually
 mkdir -p $PKG/lib/modules/${KERNVER}/misc/
@@ -62,6 +62,12 @@ fi
 EOF
 # ----------------
 
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
 
 cd $PKG
 makepkg -l y -c n $TMP/$APP-${VERSION}_${KERNVER}-$ARCH-${BUILD}${TAG}.txz
