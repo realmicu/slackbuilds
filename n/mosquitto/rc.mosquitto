@@ -1,0 +1,60 @@
+#!/bin/sh
+#
+# /etc/rc.d/rc.mosquitto
+#
+# An open source MQTT broker.
+#
+
+MOSQUITTO_CMD="/usr/sbin/mosquitto"
+MOSQUITTO_CONF="/etc/mosquitto/mosquitto.conf"
+MOSQUITTO_PID="/run/mosquitto.pid"
+
+MOSQUITTO_OPTS=""
+
+mosquitto_start() {
+  if [ -x $MOSQUITTO_CMD -a -r $MOSQUITTO_CONF ]; then
+    echo "Starting mosquitto:  $MOSQUITTO_CMD -d -c $MOSQUITTO_CONF $MOSQUITTO_OPTS"
+    $MOSQUITTO_CMD -d -c $MOSQUITTO_CONF $MOSQUITTO_OPTS
+  fi
+}
+
+mosquitto_stop() {
+  echo "Stopping mosquitto."
+  if [ -r $MOSQUITTO_PID ]; then
+    kill $(cat $MOSQUITTO_PID)
+  else
+    killall mosquitto
+  fi
+}
+
+mosquitto_restart() {
+  mosquitto_stop
+  sleep 1
+  mosquitto_start
+}
+
+mosquitto_reload() {
+  echo "Reloading mosquitto configuration."
+  if [ -r $MOSQUITTO_PID ]; then
+    kill -HUP $(cat $MOSQUITTO_PID)
+  else
+    killall -HUP mosquitto
+  fi
+}
+
+case "$1" in
+'start')
+  mosquitto_start
+  ;;
+'stop')
+  mosquitto_stop
+  ;;
+'restart')
+  mosquitto_restart
+  ;;
+'reload')
+  mosquitto_reload
+  ;;
+*)
+  echo "Usage: $0 {start|stop|restart|reload}"
+esac

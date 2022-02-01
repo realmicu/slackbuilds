@@ -1,0 +1,17 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+         |-----handy-ruler------------------------------------------------------|
+mosquitto: mosquitto (open source MQTT broker)
+mosquitto:
+mosquitto: Eclipse Mosquitto is an open source (EPL/EDL licensed) message broker
+mosquitto: that implements the MQTT protocol versions 5.0, 3.1.1 and 3.1.
+mosquitto: Mosquitto is lightweight and is suitable for use on all devices from
+mosquitto: low power single board computers to full servers.
+mosquitto:
+mosquitto: URL: https://mosquitto.org/
+mosquitto:
