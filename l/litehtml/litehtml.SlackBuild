@@ -7,6 +7,8 @@ VERSION=$(ls $APP-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
+TMP=${TMP:-/tmp}
+OUTDIR=${OUTDIR:-$TMP}
 
 LIBSUFFIX=""
 
@@ -14,11 +16,8 @@ if [ "$ARCH" = "x86_64" ]; then
   LIBSUFFIX=${LIBSUFFIX:-64}
 fi
 
-MAKE="make -j 5"
+MAKE="make -j $(nproc)"
 
-if [ "$TMP" = "" ]; then
-  TMP=/tmp
-fi
 PKG=$TMP/package-$APP
 rm -rf $PKG
 mkdir -p $PKG
@@ -89,7 +88,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 cd $PKG
-makepkg -l y -c n $TMP/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
+makepkg -l y -c n $OUTDIR/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
 
 # Clean up the extra stuff:
 if [ "$1" = "--cleanup" ]; then

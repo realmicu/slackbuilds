@@ -10,6 +10,8 @@ VERSION=${VERSION:-$(echo ${BINDIST}-*.run | rev | cut -f 2- -d . | cut -f 1 -d 
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
+TMP=${TMP:-/tmp}
+OUTDIR=${OUTDIR:-$TMP}
 
 # run this with kernel configured/compiled!
 if [ ! -f ${KERNSRC}/include/config/kernel.release ] ; then
@@ -19,11 +21,8 @@ else
   KERNVER=$(cat ${KERNSRC}/include/config/kernel.release)
 fi
 
-MAKE="make -j 8"
+MAKE="make -j $(nproc)"
 
-if [ "$TMP" = "" ]; then
-  TMP=/tmp
-fi
 PKG=$TMP/package-$APP
 rm -rf $PKG
 mkdir -p $PKG
@@ -84,7 +83,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 cd $PKG
-makepkg -l y -c n $TMP/$APP-${VERSION}_${KERNVER}-$ARCH-${BUILD}${TAG}.txz
+makepkg -l y -c n $OUTDIR/$APP-${VERSION}_${KERNVER}-$ARCH-${BUILD}${TAG}.txz
 
 # Clean up the extra stuff:
 if [ "$1" = "--cleanup" ]; then

@@ -8,6 +8,8 @@ MARCH=${MARCH:-native}
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
+TMP=${TMP:-/tmp}
+OUTDIR=${OUTDIR:-$TMP}
 
 LIBSUFFIX=""
 
@@ -23,8 +25,8 @@ elif [ "$MARCH" = "nocona" ]; then
   SLKCFLAGS="-march=nocona -mtune=generic -mmmx -msse -msse2 -msse3"
 elif [ "$MARCH" = "core2" ]; then
   SLKCFLAGS="-march=core2 -mtune=core2 -mmmx -msse -msse2 -msse3"
-elif [ "$MARCH" = "atom" ]; then
-  SLKCFLAGS="-march=core2 -mcx16 -msahf --param l1-cache-size=24 --param l1-cache-line-size=64 --param l2-cache-size=512 -mtune=core2 -mfpmath=sse -mmmx -msse -msse2 -msse3"
+elif [ "$MARCH" = "atom" -o "$MARCH" = "bonnell" ]; then
+  SLKCFLAGS="-march=bonnell -mmmx -msse -msse2 -msse3 -mssse3 -mcx16 -msahf -mmovbe -mfxsr --param l1-cache-size=24 --param l1-cache-line-size=64 --param l2-cache-size=512 -mtune=bonnell"
 elif [ "$MARCH" = "sandybridge" ]; then
   SLKCFLAGS="-march=sandybridge"
 elif [ "$MARCH" = "pentium3" ]; then
@@ -42,9 +44,6 @@ fi
 
 MAKE="make"
 
-if [ "$TMP" = "" ]; then
-  TMP=/tmp
-fi
 PKG=$TMP/package-$APP
 rm -rf $PKG
 mkdir -p $PKG
@@ -107,7 +106,7 @@ if [ $(id -u) -ne 0 ]; then
 fi
 
 cd $PKG
-makepkg -l y -c n $TMP/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
+makepkg -l y -c n $OUTDIR/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
 
 # Clean up the extra stuff:
 if [ "$1" = "--cleanup" ]; then
