@@ -1,0 +1,47 @@
+.TH NMON "1" "August 2009" "nmon " "User Commands"
+.SH NAME
+nmon \- systems administrator, tuner, benchmark tool.
+.SH DESCRIPTION
+This manual page documents briefly the
+.B nmon
+command.
+This manual page was written for the Debian distribution
+because the original program does not have a manual page.
+.PP
+\fBnmon\fP is is a systems administrator, tuner, benchmark tool.
+It can display the CPU, memory, network, disks (mini graphs or numbers),
+file systems, NFS, top processes, resources (Linux version & processors) and
+on Power micro-partition information.
+.SH OPTIONS
+.B nmon
+follow the usual GNU command line syntax, with long
+options starting with two dashes (`-').
+nmon [\-h] [\-s <seconds>] [\-c <count>] [\-f \fB\-d\fR <disks> \fB\-t\fR \fB\-r\fR <name>] [\-x]
+A summary of options is included below.
+.TP
+\fB\-h\fR
+FULL help information
+.IP
+Interactive\-Mode:
+read startup banner and type: "h" once it is running
+For Data\-Collect\-Mode (\fB\-f\fR)
+.TP
+\fB\-f\fR            spreadsheet output format [note: default \fB\-s300\fR \fB\-c288]\fR
+optional
+.TP
+\fB\-s\fR <seconds>  between refreshing the screen [default 2]
+.TP
+\fB\-c\fR <number>   of refreshes [default millions]
+.TP
+\fB\-d\fR <disks>    to increase the number of disks [default 256]
+.TP
+\fB\-t\fR            spreadsheet includes top processes
+.TP
+\fB\-x\fR            capacity planning (15 min for 1 day = \fB\-fdt\fR \fB\-s\fR 900 \fB\-c\fR 96)
+.PP
+.SH AUTHOR
+nmon was written by Nigel Griffiths <nag@uk.ibm.com>
+.PP
+This manual page was written by Giuseppe Iuculano <giuseppe@iuculano.it>,
+for the Debian project (but may be used by others).
+
