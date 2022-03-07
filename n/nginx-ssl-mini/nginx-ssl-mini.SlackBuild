@@ -64,7 +64,7 @@ CXXFLAGS="$SLKCFLAGS" \
 ./configure --prefix=/usr \
 	    --sbin-path=/usr/sbin/$SRC \
 	    --conf-path=/etc/$SRC/${SRC}.conf \
-	    --pid-path=/var/run/${SRC}.pid \
+	    --pid-path=/run/${SRC}.pid \
 	    --lock-path=/var/lock/subsys \
 	    --user=${NGINXUSER:=nobody} \
 	    --group=${NGINXGROUP:=nogroup} \
@@ -152,7 +152,7 @@ mkdir -p -m 750 $PKG/var/lib/nginx/client_body $PKG/var/lib/nginx/proxy
 chown $NGINXUSER $PKG/var/lib/nginx/client_body $PKG/var/lib/nginx/proxy
 
 # Cleanup:
-rmdir $PKG/var/run
+rmdir $PKG/run
 ( cd $PKG/etc/nginx &&
   rm -fv koi-* win-utf fastcgi* uwsgi* scgi*
 )

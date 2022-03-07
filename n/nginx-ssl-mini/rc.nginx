@@ -3,9 +3,9 @@
 # Nginx daemon control script.
 # Written for Slackware Linux by Cherife Li <cherife-#-dotimes.com>.
 
-BIN=/usr/sbin/nginx
-CONF=/etc/nginx/nginx.conf
-PID=/var/run/nginx.pid
+BIN="/usr/sbin/nginx"
+CONF="/etc/nginx/nginx.conf"
+PID="/run/nginx.pid"
 
 nginx_start() {
   # Sanity checks.
