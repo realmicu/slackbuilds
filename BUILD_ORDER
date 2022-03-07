@@ -82,3 +82,5 @@
 	n	nginx-ssl-mini
 	l	cjson				# mosquitto
 	n	mosquitto
+	ap	nmon
+	ap	pv
