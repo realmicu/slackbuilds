@@ -78,7 +78,7 @@ if [ -d $PKG/usr/man ]; then
 fi
 
 mv $PKG/usr/share/doc $PKG/usr && mv $PKG/usr/doc/$SRC $PKG/usr/doc/$APP-$VERSION
-cp -a CONTRIBUTING.md LICENSE.txt README.md \
+cp -a LICENSE.txt README.md \
   minetest.conf.example* doc/*.txt \
   $PKG/usr/doc/$APP-$VERSION
 
