@@ -36,7 +36,8 @@
 	l	webkitgtk
 	ap	x264
 	d	luajit				# minetest
-	l	irrlicht			# minetest
+	l	irrlicht			# nodeboxeditor
+	l	irrlichtmt			# minetest
 	xap	minetest
 	ap	minetest-server
 	xap	nodeboxeditor

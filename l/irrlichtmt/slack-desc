@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+          |-----handy-ruler------------------------------------------------------|
+irrlichtmt: irrlichtmt (a free open source 3D engine - Minetest fork)
+irrlichtmt:
+irrlichtmt: The Irrlicht Engine is an open source high performance realtime
+irrlichtmt: 3D engine written in C++. It is completely cross-platform,
+irrlichtmt: using D3D, OpenGL and its own software renderers, and has
+irrlichtmt: all of the state-of-the-art features which can be found in
+irrlichtmt: commercial 3d engines.
+irrlichtmt: This is a fork by the Minetest developers that contains features,
+irrlichtmt: customizations and fixes specifically for use in Minetest.
+irrlichtmt:
+irrlichtmt: URL: https://github.com/minetest/irrlicht
