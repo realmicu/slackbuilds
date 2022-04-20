@@ -1,15 +1,3 @@
-diff --git a/kernel/Kbuild b/kernel/Kbuild
-index cce4d78..c0796a7 100644
---- a/kernel/Kbuild
-+++ b/kernel/Kbuild
-@@ -67,6 +67,7 @@ EXTRA_CFLAGS += -Wall -MD $(DEFINES) $(INCLUDES) -Wsign-compare -Wno-cast-qual -
- EXTRA_CFLAGS += -D__KERNEL__ -DMODULE -DNVRM -DNV_VERSION_STRING=\"390.144\" -Wno-unused-function -Wuninitialized -fno-strict-aliasing -mno-red-zone -mcmodel=kernel -DNV_UVM_ENABLE -Wno-sign-compare -Wno-format-extra-args
- EXTRA_CFLAGS += $(call cc-option,-Werror=undef,)
- EXTRA_CFLAGS += -DNV_SPECTRE_V2=$(NV_SPECTRE_V2)
-+EXTRA_CFLAGS += -DNV_KERNEL_INTERFACE_LAYER
- 
- #
- # Detect SGI UV systems and apply system-specific optimizations.
 diff --git a/kernel/common/inc/nv-procfs.h b/kernel/common/inc/nv-procfs.h
 index e76325c..ac5aea8 100644
 --- a/kernel/common/inc/nv-procfs.h
@@ -28,90 +16,11 @@ index e76325c..ac5aea8 100644
  #endif
  
  #if defined(NV_PROC_REMOVE_PRESENT)
-diff --git a/kernel/common/inc/nv.h b/kernel/common/inc/nv.h
-index c085b97..48b154c 100644
---- a/kernel/common/inc/nv.h
-+++ b/kernel/common/inc/nv.h
-@@ -15,7 +15,7 @@
- #include <nvlimits.h>
- #include <nvtypes.h>
- #include <nvCpuUuid.h>
--#include <stdarg.h>
-+#include "nv_stdarg.h"
- #include <nv-kernel-interface-api.h>
- #ifndef __KERNEL__
- #include "g_nvconfig.h"
-diff --git a/kernel/common/inc/nv_stdarg.h b/kernel/common/inc/nv_stdarg.h
-new file mode 100644
-index 0000000..4b63340
---- /dev/null
-+++ b/kernel/common/inc/nv_stdarg.h
-@@ -0,0 +1,39 @@
-+/*
-+ * SPDX-FileCopyrightText: Copyright (c) 2021 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
-+ * SPDX-License-Identifier: MIT
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a
-+ * copy of this software and associated documentation files (the "Software"),
-+ * to deal in the Software without restriction, including without limitation
-+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
-+ * and/or sell copies of the Software, and to permit persons to whom the
-+ * Software is furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-+ * DEALINGS IN THE SOFTWARE.
-+ */
-+
-+
-+#ifndef _NV_STDARG_H_
-+#define _NV_STDARG_H_
-+
-+#if defined(NV_KERNEL_INTERFACE_LAYER) && defined(NV_LINUX)
-+   #include "conftest.h"
-+   #if defined(NV_LINUX_STDARG_H_PRESENT)
-+     #include <linux/stdarg.h>
-+   #else
-+     #include <stdarg.h>
-+   #endif   
-+#else
-+   #include <stdarg.h>
-+#endif   
-+
-+#endif // _NV_STDARG_H_
-diff --git a/kernel/common/inc/os-interface.h b/kernel/common/inc/os-interface.h
-index 4009855..6c52239 100644
---- a/kernel/common/inc/os-interface.h
-+++ b/kernel/common/inc/os-interface.h
-@@ -24,7 +24,7 @@
- *                                                                           *
- \***************************************************************************/
- 
--#include <stdarg.h>
-+#include "nv_stdarg.h"
- #include <nv-kernel-interface-api.h>
- #include "nvipmi.h"
- 
 diff --git a/kernel/conftest.sh b/kernel/conftest.sh
-index caa3035..566ff38 100755
+index abbb636..3a83b2b 100755
 --- a/kernel/conftest.sh
 +++ b/kernel/conftest.sh
-@@ -135,6 +135,7 @@ test_headers() {
-     FILES="$FILES linux/ktime.h"
-     FILES="$FILES linux/dma-resv.h"
-     FILES="$FILES linux/dma-map-ops.h"
-+    FILES="$FILES linux/stdarg.h"
- 
-     # Arch specific headers which need testing
-     FILES_ARCH="asm/book3s/64/hash-64k.h"
-@@ -1793,16 +1794,36 @@ compile_test() {
+@@ -1794,16 +1794,36 @@ compile_test() {
  
  
          pde_data)
@@ -149,48 +58,6 @@ index caa3035..566ff38 100755
          ;;
  
          get_num_physpages)
-diff --git a/kernel/nvidia-drm/nvidia-drm-drv.c b/kernel/nvidia-drm/nvidia-drm-drv.c
-index 54389be..f74738f 100644
---- a/kernel/nvidia-drm/nvidia-drm-drv.c
-+++ b/kernel/nvidia-drm/nvidia-drm-drv.c
-@@ -20,6 +20,7 @@
-  * DEALINGS IN THE SOFTWARE.
-  */
- 
-+#include <linux/version.h>
- #include "nvidia-drm-conftest.h" /* NV_DRM_AVAILABLE and NV_DRM_DRM_GEM_H_PRESENT */
- 
- #include "nvidia-drm-priv.h"
-@@ -811,7 +812,10 @@ static void nv_drm_register_drm_device(const nv_gpu_info_t *gpu_info)
- 
-     dev->dev_private = nv_dev;
-     nv_dev->dev = dev;
-+#if (LINUX_VERSION_CODE < KERNEL_VERSION(5, 14, 0))
-+    // Rel. commit "drm: Remove pdev field from struct drm_device" (Thomas Zimmermann, 3 May 2021)
-     dev->pdev = pdev;
-+#endif
- 
-     /* Register DRM device to DRM sub-system */
- 
-diff --git a/kernel/nvidia-modeset/nvidia-modeset-os-interface.h b/kernel/nvidia-modeset/nvidia-modeset-os-interface.h
-index a7bb7c9..7ccbf06 100644
---- a/kernel/nvidia-modeset/nvidia-modeset-os-interface.h
-+++ b/kernel/nvidia-modeset/nvidia-modeset-os-interface.h
-@@ -16,9 +16,11 @@
- #if !defined(_NVIDIA_MODESET_OS_INTERFACE_H_)
- #define _NVIDIA_MODESET_OS_INTERFACE_H_
- 
--#include <stddef.h>  /* size_t */
--#include <stdarg.h>  /* va_list */
--
-+#if defined(NV_KERNEL_INTERFACE_LAYER) && defined(NV_LINUX)
-+#include <linux/stddef.h>  /* size_t */
-+#else
-+#include <stddef.h>        /* size_t */
-+#endif
- #include "nvtypes.h" /* NvU8 */
- 
- #include "nvkms.h"   /* NVKMS_API_CALL */
 diff --git a/kernel/nvidia-modeset/nvidia-modeset.Kbuild b/kernel/nvidia-modeset/nvidia-modeset.Kbuild
 index 82d1736..8a7645d 100644
 --- a/kernel/nvidia-modeset/nvidia-modeset.Kbuild
@@ -203,23 +70,6 @@ index 82d1736..8a7645d 100644
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += proc_remove
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += timer_setup
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += do_gettimeofday
-diff --git a/kernel/nvidia-modeset/nvkms.h b/kernel/nvidia-modeset/nvkms.h
-index d99904f..9acf71e 100644
---- a/kernel/nvidia-modeset/nvkms.h
-+++ b/kernel/nvidia-modeset/nvkms.h
-@@ -9,7 +9,11 @@
- #define __NV_KMS_H__
- 
- #include "nvtypes.h"
--#include <stddef.h> /* size_t */
-+#if defined(NV_KERNEL_INTERFACE_LAYER) && defined(NV_LINUX)
-+#include <linux/stddef.h> /* size_t */
-+#else
-+#include <stddef.h>       /* size_t */
-+#endif
- 
- #include "nvkms-kapi.h"
- 
 diff --git a/kernel/nvidia-uvm/nvidia-uvm.Kbuild b/kernel/nvidia-uvm/nvidia-uvm.Kbuild
 index d447e23..2f4e1f3 100644
 --- a/kernel/nvidia-uvm/nvidia-uvm.Kbuild
@@ -232,19 +82,6 @@ index d447e23..2f4e1f3 100644
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += proc_remove
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += bitmap_clear
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += usleep_range
-diff --git a/kernel/nvidia-uvm/uvm8_mmu.c b/kernel/nvidia-uvm/uvm8_mmu.c
-index b51c527..c04d77f 100644
---- a/kernel/nvidia-uvm/uvm8_mmu.c
-+++ b/kernel/nvidia-uvm/uvm8_mmu.c
-@@ -32,7 +32,7 @@
- #include "uvm8_push.h"
- #include "uvm8_mem.h"
- #include "uvm8_va_space.h"
--#include <stdarg.h>
-+#include "nv_stdarg.h"
- 
- // The page tree has 5 levels on pascal, and the root is never freed by a normal 'put' operation
- // which leaves a maximum of 4 levels
 diff --git a/kernel/nvidia/nv-mmap.c b/kernel/nvidia/nv-mmap.c
 index 288a1e0..d3c751c 100644
 --- a/kernel/nvidia/nv-mmap.c
@@ -269,29 +106,3 @@ index 185d3b5..502f6f0 100644
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += proc_remove
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += pm_vt_switch_required
  NV_CONFTEST_FUNCTION_COMPILE_TESTS += xen_ioemu_inject_msi
-diff --git a/kernel/nvidia/nvlink_linux.c b/kernel/nvidia/nvlink_linux.c
-index 872bc90..ba57b86 100644
---- a/kernel/nvidia/nvlink_linux.c
-+++ b/kernel/nvidia/nvlink_linux.c
-@@ -597,7 +597,7 @@ void NVLINK_API_CALL nvlink_sleep(unsigned int ms)
-         // the requested timeout has expired, loop until less
-         // than a jiffie of the desired delay remains.
-         //
--        current->state = TASK_INTERRUPTIBLE;
-+        set_current_state(TASK_INTERRUPTIBLE);
-         do
-         {
-             schedule_timeout(jiffies);
-diff --git a/kernel/nvidia/os-interface.c b/kernel/nvidia/os-interface.c
-index 3603a5a..262171f 100644
---- a/kernel/nvidia/os-interface.c
-+++ b/kernel/nvidia/os-interface.c
-@@ -580,7 +580,7 @@ NV_STATUS NV_API_CALL os_delay(NvU32 MilliSeconds)
-         // the requested timeout has expired, loop until less
-         // than a jiffie of the desired delay remains.
-         //
--        current->state = TASK_INTERRUPTIBLE;
-+        set_current_state(TASK_INTERRUPTIBLE);
-         do
-         {
-             schedule_timeout(jiffies);
