@@ -36,8 +36,8 @@ find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
 # Apply patches if present:
-# (search path is patches/linux-X.Y/*.patch)
-KPATCHDIR=$CWD/patches/linux-${KERNVER%.*}
+# (search path is patches/DRIVER_VERSION/KERNEL_VERSION/*.patch)
+KPATCHDIR=$CWD/patches/${VERSION}/${KERNVER%.*}
 if [ -d $KPATCHDIR ] ; then
   ls $KPATCHDIR/*.patch 2>/dev/null | while read p ; do
     patch -p1 < $p || exit 1
