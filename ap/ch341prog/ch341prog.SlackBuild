@@ -53,7 +53,7 @@ cd $TMP
 rm -rf $APP-$VERSION
 tar xvf $CWD/$APP-$VERSION.tar.?z* || exit 1
 cd $APP-$VERSION || exit 1
-chown -R root.root .
+chown -R root:root .
 find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
@@ -67,11 +67,11 @@ CFLAGS="$SLKCFLAGS" \
 # install manually
 mkdir -p $PKG/usr/bin && \
   cp $APP $PKG/usr/bin && \
-  chown -R root.bin $PKG/usr/bin/${APP} && \
+  chown -R root:bin $PKG/usr/bin/${APP} && \
   chmod 755 $PKG/usr/bin/${APP}
 mkdir -p $PKG/etc/udev/rules.d && \
   cp -v *.rules $PKG/etc/udev/rules.d && \
-  chown root.root $PKG/etc/udev/rules.d/* && \
+  chown root:root $PKG/etc/udev/rules.d/* && \
   chmod 644 $PKG/etc/udev/rules.d/*
 
 strip --strip-unneeded $PKG/usr/bin/${APP} 2>/dev/null

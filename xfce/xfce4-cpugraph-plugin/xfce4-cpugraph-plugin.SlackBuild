@@ -53,7 +53,7 @@ cd $TMP
 rm -rf $APP-$VERSION
 tar xvf $CWD/$APP-$VERSION.tar.?z* || exit 1
 cd $APP-$VERSION || exit 1
-chown -R root.root .
+chown -R root:root .
 find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;

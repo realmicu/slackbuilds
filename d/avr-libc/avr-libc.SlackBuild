@@ -88,7 +88,7 @@ if [ -f $CWD/$APP-manpages-$VERSION.tar.?z* ]; then
     tar xvf $CWD/$APP-manpages-$VERSION.tar.?z* )
 fi
 
-chown -R root.bin $PKG/usr/bin
+chown -R root:bin $PKG/usr/bin
 
 ( cd $PKG
   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null

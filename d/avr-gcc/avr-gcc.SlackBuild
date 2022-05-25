@@ -118,7 +118,7 @@ rm -rf $PKG/usr/share
 rm -rf $PKG/usr/man/man7
 rm -rf $PKG/usr/libexec/gcc/avr/$VERSION/install-tools
 
-chown -R root.bin $PKG/usr/bin
+chown -R root:bin $PKG/usr/bin
 
 ( cd $PKG
   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
