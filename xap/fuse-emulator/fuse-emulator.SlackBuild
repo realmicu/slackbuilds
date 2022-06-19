@@ -69,6 +69,7 @@ CXXFLAGS="$SLKCFLAGS" \
 	    --docdir=/usr/doc/$APP-$VERSION \
 	    --enable-gtk3 \
 	    --enable-desktop-integration \
+	    --with-audio-driver=pulseaudio \
 	    --build=$ARCH-slackware-linux || exit 1
 
 $MAKE || exit 1
