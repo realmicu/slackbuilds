@@ -46,7 +46,7 @@ fi
 
 cd kernel || exit 1
 
-$MAKE NV_EXCLUDE_KERNEL_MODULES="nvidia-uvm " SYSSRC="$KERNSRC" || exit 1
+$MAKE CC="gcc" NV_EXCLUDE_KERNEL_MODULES="nvidia-uvm " SYSSRC="$KERNSRC" || exit 1
 
 # install manually
 DESTDIR=$PKG/lib/modules/${KERNVER}/kernel/drivers/video
