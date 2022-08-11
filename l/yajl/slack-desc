@@ -12,7 +12,7 @@ yajl: YAJL is a small event-driven (SAX-style) JSON parser written in
 yajl: ANSI C, and a small validating JSON generator. YAJL is released under
 yajl: the ISC license.
 yajl:
-yajl: http://lloyd.github.com/yajl/
+yajl: https://lloyd.github.io/yajl/
 yajl:
 yajl:
 yajl:
