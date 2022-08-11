@@ -36,6 +36,7 @@ cmake . \
       -DCMAKE_INSTALL_PREFIX=/usr \
       -DCUSTOM_MANDIR=/usr/man \
       -DENABLE_GETTEXT=TRUE \
+      -DENABLE_UPDATE_CHECKER=FALSE \
       -DBUILD_CLIENT=TRUE || exit 1
 
 $MAKE || exit 1
