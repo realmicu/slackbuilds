@@ -6,14 +6,14 @@
 # customary to leave one space after the ':' except on otherwise blank lines.
 
       |-----handy-ruler------------------------------------------------------|
-podman: podman (utility to run OCI-based containers)
+podman: podman (tool for managing OCI containers and pods)
 podman:
-podman: libpod provides a library for applications looking to use the
-podman: Container Pod concept popularized by Kubernetes. libpod also contains
-podman: a tool called podman for managing Pods, Containers, and Container
-podman: Images.
+podman: Podman (the POD MANager) is a tool for managing containers and images,
+podman: volumes mounted into those containers, and pods made from groups of
+podman: containers. Podman is based on libpod, a library for container
+podman: lifecycle management. The libpod library provides APIs for managing
+podman: containers, pods, container images, and volumes.
 podman:
-podman: Git: https://github.com/containers/libpod
-podman:
+podman: Git: https://github.com/containers/podman
 podman:
 podman:
