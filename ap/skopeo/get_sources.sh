@@ -1,9 +1,5 @@
 #!/bin/bash
 SRC=skopeo
-VERSION=1.5.2
-# Build requires a proper git tree:
-git clone -b main https://github.com/containers/${SRC}.git $SRC && \
-  ( cd $SRC && git co v${VERSION} )
-mv $SRC ${SRC}-${VERSION}
-tar cf - ${SRC}-${VERSION} | xz -c9 > ${SRC}-${VERSION}.tar.xz
-[ -s ${SRC}-${VERSION}.tar.xz ] && rm -rf ${SRC}-${VERSION}
+VERSION=1.9.2
+set -x
+wget -c -O ${SRC}-${VERSION}.tar.gz https://github.com/containers/${SRC}/archive/refs/tags/v${VERSION}.tar.gz
