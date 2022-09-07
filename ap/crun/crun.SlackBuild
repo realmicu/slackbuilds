@@ -58,7 +58,7 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-./autogen.sh || exit 1
+[ -x configure ] || ./autogen.sh || exit 1
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
