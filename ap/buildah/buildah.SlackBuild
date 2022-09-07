@@ -10,6 +10,8 @@ TAG=${TAG:-micu}
 TMP=${TMP:-/tmp}
 OUTDIR=${OUTDIR:-$TMP}
 
+# Go version (empty for current)
+GOVER=${GOVER:-1.18.6}
 # The domain part of the go package name, usually the hosting platform
 DOMAIN=github.com
 # The name of the organization/owner of the package
@@ -46,9 +48,10 @@ if [ ! -x $GODEVDIR/go/bin/go ]; then
   echo "Development go not found at $GODEVDIR, building it."
   mkdir -p $GODEVDIR
   cd $GODEVDIR || exit 1
-  git clone https://go.googlesource.com/go
+  git clone https://go.googlesource.com/go || exit 1
   export GOPATH=$GODEVDIR/go
   cd $GOPATH
+  [ -z "$GOVER" ] || git checkout go$GOVER || exit 1
   cd src || exit 1
   ./all.bash || exit 1
   cd $TMP/$APP-$VERSION/src/$DOMAIN/$ORG/$REPONAME || exit 1
@@ -65,16 +68,16 @@ make install install.completions DESTDIR="$PKG" PREFIX="/usr" MANDIR="/usr/man" 
 
 # Change runtime:
 mkdir -p $PKG/etc/profile.d
-cat > $PKG/etc/profile.d/buildah.sh << EOF
+cat > $PKG/etc/profile.d/buildah.sh.new << EOF
 #!/bin/sh
 BUILDAH_RUNTIME=/usr/bin/crun
 export BUILDAH_RUNTIME
 EOF
-cat > $PKG/etc/profile.d/buildah.csh << EOF
+cat > $PKG/etc/profile.d/buildah.csh.new << EOF
 #!/bin/csh
 setenv BUILDAH_RUNTIME /usr/bin/crun
 EOF
-chmod 755 $PKG/etc/profile.d/buildah.*sh
+chmod 755 $PKG/etc/profile.d/buildah.*sh.new
 
 # Don't ship .la files:
 rm -f $PKG/{,usr/}lib${LIBSUFFIX}/*.la
