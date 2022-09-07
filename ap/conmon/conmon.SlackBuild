@@ -58,9 +58,6 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-# Fix build error:
-patch -p1 < $CWD/meson-build-cc.patch || exit 1
-
 meson build -Dc_args="$SLKCFLAGS" -Dcpp_args="$SLKCFLAGS" \
 	--buildtype=release \
 	--prefix=/usr \
