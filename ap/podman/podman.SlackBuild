@@ -75,6 +75,7 @@ mkdir -p $PKG/etc/containers $PKG/etc/cni/net.d $PKG/etc/modprobe.d
 sed -e 's:^#cgroup_manager = "systemd":cgroup_manager = "cgroupfs":' \
   -e 's:^#events_logger = "journald":events_logger = "file":' \
   -e 's:^#seccomp_profile = "/usr/share/containers/seccomp.json":seccomp_profile = "/etc/containers/seccomp.json":' \
+  -e 's:^#network_backend = "":network_backend = "cni":' \
   vendor/$DOMAIN/$ORG/common/pkg/config/containers.conf > $PKG/etc/containers/containers.conf.new
 
 cp -v vendor/$DOMAIN/$ORG/storage/storage.conf $PKG/etc/containers/storage.conf.new
