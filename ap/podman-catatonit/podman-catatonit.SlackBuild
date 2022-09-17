@@ -127,7 +127,7 @@ makepkg -l y -c n $OUTDIR/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
 
 # Clean up the extra stuff:
 if [ "$1" = "--cleanup" ]; then
-  rm -rf $TMP/$APP-$VERSION
+  rm -rf $TMP/$SRC-$VERSION
   rm -rf $PKG
 fi
 
