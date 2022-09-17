@@ -1,0 +1,18 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+                |-----handy-ruler------------------------------------------------------|
+podman-catatonit: podman-catatonit (container init for podman)
+podman-catatonit:
+podman-catatonit: A container init that is so simple it's effectively brain-dead. This
+podman-catatonit: is a rewrite of initrs in C - which, in turn, is a reimplementation
+podman-catatonit: of other container inits like tini and dumb-init.
+podman-catatonit: This version integrates itself with podman by putting its binary in
+podman-catatonit: podman's default helper search path.
+podman-catatonit:
+podman-catatonit: URL: https://github.com/openSUSE/catatonit
+podman-catatonit:

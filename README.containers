@@ -11,6 +11,7 @@ Container packages (in build order):
   n/cni-plugins
   ap/fuse-overlayfs
   ap/podman
+  ap/podman-catatonit
   ap/buildah
   ap/skopeo
 
