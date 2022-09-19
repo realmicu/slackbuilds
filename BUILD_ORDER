@@ -78,6 +78,7 @@
 	n	cni-plugins			# podman
 	ap	fuse-overlayfs			# podman
 	ap	podman
+	ap	podman-catatonit
 	ap	buildah
 	ap	skopeo
 	n	nginx-ssl-mini
