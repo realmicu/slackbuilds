@@ -81,7 +81,6 @@
 	ap	podman-catatonit
 	ap	buildah
 	ap	skopeo
-	n	nginx-ssl-mini
 	l	cjson				# mosquitto
 	n	mosquitto
 	ap	nmon
