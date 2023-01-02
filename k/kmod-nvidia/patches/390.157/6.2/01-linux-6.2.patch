@@ -1,0 +1,134 @@
+diff --git a/kernel/conftest.sh b/kernel/conftest.sh
+index 24daa85..0988bde 100755
+--- a/kernel/conftest.sh
++++ b/kernel/conftest.sh
+@@ -844,12 +844,19 @@ compile_test() {
+ 
+             echo "$CONFTEST_PREAMBLE
+             #include <linux/acpi.h>
++            #include <linux/version.h>
+ 
++            #if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 2, 0))
+             acpi_op_remove conftest_op_remove_routine;
+ 
+             int conftest_acpi_device_ops_remove(struct acpi_device *device) {
+                 return conftest_op_remove_routine(device);
+-            }" > conftest$$.c
++            }
++            #else
++            void conftest_acpi_device_ops_remove(struct acpi_device *device) {
++                return;
++            }
++            #endif" > conftest$$.c
+ 
+             $CC $CFLAGS -c conftest$$.c > /dev/null 2>&1
+             rm -f conftest$$.c
+diff --git a/kernel/nvidia-drm/nvidia-drm-connector.c b/kernel/nvidia-drm/nvidia-drm-connector.c
+index 54167a7..0e7b97d 100644
+--- a/kernel/nvidia-drm/nvidia-drm-connector.c
++++ b/kernel/nvidia-drm/nvidia-drm-connector.c
+@@ -20,6 +20,8 @@
+  * DEALINGS IN THE SOFTWARE.
+  */
+ 
++#include <linux/version.h>
++#include <drm/drm_edid.h>
+ #include "nvidia-drm-conftest.h" /* NV_DRM_ATOMIC_MODESET_AVAILABLE */
+ 
+ #if defined(NV_DRM_ATOMIC_MODESET_AVAILABLE)
+@@ -98,6 +100,7 @@ __nv_drm_detect_encoder(struct NvKmsKapiDynamicDisplayParams *pDetectParams,
+             break;
+     }
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 2, 0))
+     if (connector->override_edid) {
+         const struct drm_property_blob *edid = connector->edid_blob_ptr;
+ 
+@@ -110,6 +113,22 @@ __nv_drm_detect_encoder(struct NvKmsKapiDynamicDisplayParams *pDetectParams,
+                     sizeof(pDetectParams->edid.buffer));
+         }
+     }
++#else
++    mutex_lock(&connector->edid_override_mutex);
++    if (connector->edid_override) {
++        const struct edid *edid = drm_edid_raw(connector->edid_override);
++	size_t edid_length = EDID_LENGTH * (edid->extensions + 1);
++	if (edid_length <= sizeof(pDetectParams->edid.buffer)) {
++	    memcpy(pDetectParams->edid.buffer, edid, edid_length);
++	    pDetectParams->edid.bufferSize = edid_length;
++	    pDetectParams->overrideEdid = NV_TRUE;
++        } else {
++            WARN_ON(edid_length >
++                    sizeof(pDetectParams->edid.buffer));
++        }
++    }
++    mutex_unlock(&connector->edid_override_mutex);
++#endif
+ 
+     if (!nvKms->getDynamicDisplayInfo(nv_dev->pDevice, pDetectParams)) {
+         NV_DRM_DEV_LOG_ERR(
+diff --git a/kernel/nvidia-drm/nvidia-drm-drv.c b/kernel/nvidia-drm/nvidia-drm-drv.c
+index 1289cb3..5b6569c 100644
+--- a/kernel/nvidia-drm/nvidia-drm-drv.c
++++ b/kernel/nvidia-drm/nvidia-drm-drv.c
+@@ -59,6 +59,7 @@
+ #include <drm/drm_ioctl.h>
+ #endif
+ 
++#include <linux/version.h>
+ #include <linux/pci.h>
+ 
+ /*
+@@ -239,9 +240,11 @@ nv_drm_init_mode_config(struct nv_drm_device *nv_dev,
+     dev->mode_config.preferred_depth = 24;
+     dev->mode_config.prefer_shadow = 1;
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 2, 0))
+     /* Currently unused. Update when needed. */
+ 
+     dev->mode_config.fb_base = 0;
++#endif
+ 
+     dev->mode_config.async_page_flip = false;
+ 
+diff --git a/kernel/nvidia/nv-acpi.c b/kernel/nvidia/nv-acpi.c
+index da9fbc9..dba78cf 100644
+--- a/kernel/nvidia/nv-acpi.c
++++ b/kernel/nvidia/nv-acpi.c
+@@ -23,10 +23,16 @@ static NV_STATUS   nv_acpi_extract_object  (const union acpi_object *, void *, N
+ 
+ static int         nv_acpi_add             (struct acpi_device *);
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 2, 0))
++#define _NV_AROA_TYPE int
++#else
++#define _NV_AROA_TYPE void
++#endif
++
+ #if !defined(NV_ACPI_DEVICE_OPS_REMOVE_ARGUMENT_COUNT) || (NV_ACPI_DEVICE_OPS_REMOVE_ARGUMENT_COUNT == 2)
+ static int         nv_acpi_remove_two_args(struct acpi_device *device, int type);
+ #else
+-static int         nv_acpi_remove_one_arg(struct acpi_device *device);
++static _NV_AROA_TYPE nv_acpi_remove_one_arg(struct acpi_device *device);
+ #endif
+ 
+ static void        nv_acpi_event           (acpi_handle, u32, void *);
+@@ -334,7 +340,7 @@ static int nv_acpi_add(struct acpi_device *device)
+ #if !defined(NV_ACPI_DEVICE_OPS_REMOVE_ARGUMENT_COUNT) || (NV_ACPI_DEVICE_OPS_REMOVE_ARGUMENT_COUNT == 2)
+ static int nv_acpi_remove_two_args(struct acpi_device *device, int type)
+ #else
+-static int nv_acpi_remove_one_arg(struct acpi_device *device)
++static _NV_AROA_TYPE nv_acpi_remove_one_arg(struct acpi_device *device)
+ #endif
+ {
+     /*
+@@ -385,7 +391,9 @@ static int nv_acpi_remove_one_arg(struct acpi_device *device)
+         device->driver_data = NULL;
+     }
+ 
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 2, 0))
+     return status;
++#endif
+ }
+ 
+ static void nv_acpi_event(acpi_handle handle, u32 event_type, void *data)
