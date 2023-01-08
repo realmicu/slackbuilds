@@ -58,11 +58,12 @@ find . -perm 666 -exec chmod 644 {} \;
 
 $MAKE CFLAGS="-Os -Wall -Wshadow $SLKCFLAGS" PREFIX=/usr MANDIR=/usr/man || exit 1
 $MAKE PREFIX=/usr MANDIR=/usr/man DESTDIR=$PKG install || exit 1
+mv -v $PKG/usr/sbin $PKG/usr/bin
 
 # Don't ship .la files:
 rm -f $PKG/{,usr/}lib${LIBSUFFIX}/*.la
 
-chown -R root:root $PKG/usr/sbin
+chown -R root:root $PKG/usr/bin
 
 ( cd $PKG
   find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null

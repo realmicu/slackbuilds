@@ -1,6 +1,6 @@
 #!/bin/bash
 SRC=flashrom
-VERSION=1.1
+VERSION=1.2
 set -x
 wget -c https://download.flashrom.org/releases/${SRC}-v${VERSION}.tar.bz2 && \
   tar xjf ${SRC}-v${VERSION}.tar.bz2 && \
