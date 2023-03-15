@@ -35,7 +35,8 @@
 	l	libhyphen
 	l	webkitgtk
 	ap	x264
-	d	luajit				# minetest
+	d	luajit				# minetest,luarocks
+	d	luarocks
 	l	irrlicht			# nodeboxeditor
 	l	irrlichtmt			# minetest
 	xap	minetest
