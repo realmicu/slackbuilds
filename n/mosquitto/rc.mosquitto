@@ -7,12 +7,18 @@
 
 MOSQUITTO_CMD="/usr/sbin/mosquitto"
 MOSQUITTO_CONF="/etc/mosquitto/mosquitto.conf"
-MOSQUITTO_PID="/run/mosquitto.pid"
+MOSQUITTO_PID="/run/mosquitto/mosquitto.pid"
+MOSQUITTO_USER="mosquitto"
 
 MOSQUITTO_OPTS=""
 
 mosquitto_start() {
   if [ -x $MOSQUITTO_CMD -a -r $MOSQUITTO_CONF ]; then
+    RUNDIR=$(dirname $MOSQUITTO_PID)
+    if [ ! -d $RUNDIR ]; then
+      mkdir -pm 750 $RUNDIR
+      chown $MOSQUITTO_USER $RUNDIR
+    fi
     echo "Starting mosquitto:  $MOSQUITTO_CMD -d -c $MOSQUITTO_CONF $MOSQUITTO_OPTS"
     $MOSQUITTO_CMD -d -c $MOSQUITTO_CONF $MOSQUITTO_OPTS
   fi
