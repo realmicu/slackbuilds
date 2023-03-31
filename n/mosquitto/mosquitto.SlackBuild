@@ -66,8 +66,9 @@ $MAKE || exit 1
 make install DESTDIR=$PKG || exit 1
 
 mv $PKG/etc/mosquitto/mosquitto.conf{,.new}
-mkdir -p $PKG/var/lib/mosquitto $PKG/etc/rc.d
+mkdir -p $PKG/var/lib/mosquitto $PKG/etc/rc.d $PKG/var/log/mosquitto $PKG/etc/logrotate.d
 cat $CWD/rc.mosquitto > $PKG/etc/rc.d/rc.mosquitto.new
+cat $CWD/logrotate.mosquitto > $PKG/etc/logrotate.d/mosquitto.new
 
 # Don't ship .la files:
 rm -f $PKG/{,usr/}lib${LIBSUFFIX}/*.la

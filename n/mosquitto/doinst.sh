@@ -13,6 +13,7 @@ config() {
 
 config etc/mosquitto/mosquitto.conf.new
 config etc/rc.d/rc.mosquitto.new
+config etc/logrotate.d/mosquitto.new
 
 if ! grep -q '^mosquitto:' etc/passwd ; then
   cp -a etc/passwd etc/passwd.new
@@ -29,5 +30,5 @@ if ! grep -q '^mosquitto:' etc/group ; then
   echo "mosquitto:x:188:" >> etc/group.new
 fi
 
-chown 188:188 var/lib/mosquitto
+chown 188:188 var/lib/mosquitto var/log/mosquitto
 chmod 750 var/lib/mosquitto

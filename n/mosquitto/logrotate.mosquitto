@@ -1,0 +1,5 @@
+/var/log/mosquitto/mosquitto.log {
+    postrotate
+        [ -x /etc/rc.d/rc.mosquitto ] && /etc/rc.d/rc.mosquitto reload
+    endscript
+}
