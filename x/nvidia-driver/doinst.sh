@@ -1,4 +1,4 @@
-( cd usr/lib64/xorg/modules/extensions
+( cd usr/lib${LIBSUFFIX}/xorg/modules/extensions
   if [ -f libglx.so ] ; then
     if [ -L libglx.so ] ; then rm -f libglx.so
     else mv libglx.so libglx.so-xorg ; fi

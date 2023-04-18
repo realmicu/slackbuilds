@@ -114,12 +114,19 @@ cp -av nvidia-settings.png $PKG/usr/share/pixmaps
   ln -s libnvidia-wfb.so.$VERSION libnvidia-wfb.so.1
 )
 
+# Fix for glibc-2.37+:
+# (https://bbs.archlinux.org/viewtopic.php?pid=2083661#p2083661)
+mkdir -p $PKG/etc/ld.so.conf.d
+echo "/usr/lib${LIBSUFFIX}/tls" > $PKG/etc/ld.so.conf.d/nvidia.conf
+
 chown -R root:bin $PKG/usr/bin
 
 mkdir -p $PKG/install
-echo "VERSION=$VERSION" > $PKG/install/doinst.sh
+echo "VERSION=\"$VERSION\"" > $PKG/install/doinst.sh
+echo "LIBSUFFIX=\"$LIBSUFFIX\"" >> $PKG/install/doinst.sh
+echo "LIBSUFFIX=\"$LIBSUFFIX\"" > $PKG/install/douninst.sh
 [ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh >> $PKG/install/doinst.sh
-[ -f $CWD/douninst.sh ] && cat $CWD/douninst.sh > $PKG/install/douninst.sh
+[ -f $CWD/douninst.sh ] && cat $CWD/douninst.sh >> $PKG/install/douninst.sh
 cat $CWD/slack-desc > $PKG/install/slack-desc
 
 # Allow to run as non-root until now:
