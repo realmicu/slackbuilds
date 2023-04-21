@@ -1,0 +1,50 @@
+#!/bin/sh
+# Set initial variables:
+CWD=$(pwd)
+
+APP=nouveau-firmware
+BINDIST=NVIDIA-Linux-x86_64
+VERSION=${VERSION:-$(echo ${BINDIST}-*.run | rev | cut -f 2- -d . | cut -f 1 -d - | rev)}
+ARCH=${ARCH:-noarch}
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+TMP=${TMP:-/tmp}
+OUTDIR=${OUTDIR:-$TMP}
+
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG
+cd $TMP
+rm -rf $APP-$VERSION
+mkdir -p $APP-$VERSION
+cd $APP-$VERSION || exit 1
+$CWD/${BINDIST}-${VERSION}.run -x || exit 1
+$CWD/extract_firmware.py || exit 1
+chown -R root:root .
+find . -perm 444 -exec chmod 644 {} \;
+find . -perm 777 -exec chmod 755 {} \;
+find . -perm 666 -exec chmod 644 {} \;
+mkdir -p $PKG/lib/firmware/nouveau || exit 1
+mv -v nv* vuc-* $PKG/lib/firmware/nouveau || exit 1
+chmod 644 $PKG/lib/firmware/nouveau/{nv,vuc-}*
+
+mkdir -p $PKG/install
+[ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh > $PKG/install/doinst.sh
+[ -f $CWD/doinst.sh.gz ] && zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
+
+cd $PKG
+makepkg -l y -c n $OUTDIR/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/$APP-$VERSION
+  rm -rf $PKG
+fi

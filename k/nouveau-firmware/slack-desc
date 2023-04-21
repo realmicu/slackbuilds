@@ -1,0 +1,15 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+                |-----handy-ruler------------------------------------------------------|
+nouveau-firmware: nouveau-firmware (kernel and mesa firmware for nouveau)
+nouveau-firmware:
+nouveau-firmware: This package provides video and pgraph firmwares for legacy NVIDIA
+nouveau-firmware: chipsets to be used by open-source nouveau driver.
+nouveau-firmware:
+nouveau-firmware: URL: https://nouveau.freedesktop.org/VideoAcceleration.html
+nouveau-firmware:
