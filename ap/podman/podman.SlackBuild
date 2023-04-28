@@ -40,27 +40,42 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-# Fresh build usually requires very recent 'go' version, newer than
-# system (gcc)go. So let's be brave, invest some time and build
-# a dedicated environment (or use the one already built there):
-GODEVDIR=${GODEVDIR:-$TMP/go-devel}
-if [ ! -x $GODEVDIR/go/bin/go ]; then
-  echo "Development go not found at $GODEVDIR, building it."
-  mkdir -p $GODEVDIR
-  cd $GODEVDIR || exit 1
-  git clone https://go.googlesource.com/go || exit 1
-  export GOPATH=$GODEVDIR/go
-  cd $GOPATH
-  [ -z "$GOVER" ] || git checkout go$GOVER || exit 1
-  cd src || exit 1
-  ./all.bash || exit 1
-  cd $TMP/$APP-$VERSION/src/$DOMAIN/$ORG/$REPONAME || exit 1
-else
-  echo "Development go found at $GODEVDIR, using it."
+# Check if we have recent go build, like the one from alien repo:
+if [ ! -z "$GOROOT" ] ; then
+  if [ -x "$GOROOT/bin/go" ] ; then
+    if ! echo $PATH | grep -q $GOROOT/bin ; then
+      export PATH=$GOROOT/bin:$PATH
+    fi
+  else
+    export GOROOT=""
+  fi
 fi
-export PATH=$GODEVDIR/go/bin:$PATH
 
-# Point go to the location of the source tree
+# We do not have a working go in the system:
+if [ -z "$GOROOT" ] ; then
+  # Fresh build usually requires very recent 'go' version, newer than
+  # system (gcc)go. So let's be brave, invest some time and build
+  # a dedicated environment (or use the one already built there):
+  GODEVDIR=${GODEVDIR:-$TMP/go-devel}
+  if [ ! -x $GODEVDIR/go/bin/go ]; then
+    echo "Development go not found at $GODEVDIR, building it."
+    mkdir -p $GODEVDIR
+    cd $GODEVDIR || exit 1
+    git clone https://go.googlesource.com/go || exit 1
+    export GOPATH=$GODEVDIR/go
+    cd $GOPATH
+    [ -z "$GOVER" ] || git checkout go$GOVER || exit 1
+    cd src || exit 1
+    ./all.bash || exit 1
+    cd $TMP/$APP-$VERSION/src/$DOMAIN/$ORG/$REPONAME || exit 1
+  else
+    echo "Development go found at $GODEVDIR, using it."
+  fi
+  export GOROOT=$GODEVDIR/go
+  export PATH=$GOROOT/bin:$PATH
+fi
+
+# Point go to the location of the source tree:
 export GOPATH="$TMP/$APP-$VERSION"
 
 make all PREFIX="/usr" ETCDIR="/etc" MANDIR="/usr/man" || exit 1
@@ -141,5 +156,5 @@ makepkg -l y -c n $OUTDIR/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
 if [ "$1" = "--cleanup" ]; then
   rm -rf $TMP/$APP-$VERSION
   rm -rf $PKG
-  rm -rf $GODEVDIR
+  [ -z "$GODEVDIR" ] || rm -rf $GODEVDIR
 fi

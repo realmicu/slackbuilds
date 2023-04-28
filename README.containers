@@ -21,11 +21,17 @@ Build notes:
 
 Tools are configured to use crun binary, not default runc.
 
+Buildah binary version matches that of podman internal buildah module.
+
 Usually gccgo in slackware (even current) is at version too old to build
 recent podman, buildah and skopeo. Because of this, build scripts for
-these 3 tools fetch and compile development branch of go if none is
-already present in /tmp/go-devel - otherwise it is reused.
-Therefore, to save time and energy, it is advised to keep /tmp/go-devel
-until last of container tools is built. Then it can be safely deleted.
-
-Buildah binary version matches that of podman internal buildah module.
+these 3 tools search/prepare 'go' framework in following order:
+ * if 'go' is available at $GOROOT/bin/go (version from alien repo is
+   confirmed to work), use it
+ * otherwise try to reuse already built temporary version in /tmp/go-devel
+ * else fetch and compile development branch of 'go' and deploy it into
+   /tmp/go-devel
+Recommended approach is to install 'google-go-lang' from alienbob repo.
+Alternatively, let script prepare temporary environment in /tmp/go-devel
+and keep it there until last of container tools is built. Then it can be
+safely deleted.
