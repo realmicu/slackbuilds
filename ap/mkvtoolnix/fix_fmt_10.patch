@@ -1,0 +1,24 @@
+diff --git a/NEWS.md b/NEWS.md
+index 878f8b4..ec6fd3b 100644
+--- a/NEWS.md
++++ b/NEWS.md
+@@ -67,6 +67,7 @@
+   elements aren't supported there. Part of the implementation of #3511.
+ * mkvpropedit: fixed replacing chapters & tags in files that don't contain
+   tracks. Fixes #3498.
++* Fixed compilation with fmt v10.0.0.
+ 
+ 
+ # Version 75.0.0 "Goliath" 2023-03-26
+diff --git a/src/common/codec.h b/src/common/codec.h
+index f8bc1b4..f4a92c3 100644
+--- a/src/common/codec.h
++++ b/src/common/codec.h
+@@ -231,3 +231,7 @@ operator <<(std::ostream &out,
+ 
+   return out;
+ }
++
++#if FMT_VERSION >= 90000
++template <> struct fmt::formatter<codec_c> : ostream_formatter {};
++#endif  // FMT_VERSION >= 90000
