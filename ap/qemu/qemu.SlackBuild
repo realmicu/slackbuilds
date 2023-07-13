@@ -60,9 +60,6 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-# Remove failing keymap (8.0.2):
-patch -p1 < $CWD/remove-ar-keymap.patch
-
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
 ./configure --prefix=/usr \

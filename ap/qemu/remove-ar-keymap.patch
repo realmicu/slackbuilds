@@ -1,8 +1,0 @@
---- a/pc-bios/keymaps/meson.build	2023-05-31 03:02:04.000000000 +0200
-+++ b/pc-bios/keymaps/meson.build	2023-06-26 17:59:14.844290475 +0200
-@@ -1,5 +1,4 @@
- keymaps = {
--  'ar': '-l ar',
-   'bepo': '-l fr -v dvorak',
-   'cz': '-l cz',
-   'da': '-l dk',
