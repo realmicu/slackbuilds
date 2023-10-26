@@ -1,0 +1,68 @@
+diff --git a/kernel/nvidia/nv-gpu-numa.c b/kernel/nvidia/nv-gpu-numa.c
+index 7916d35..a3c8ceb 100644
+--- a/kernel/nvidia/nv-gpu-numa.c
++++ b/kernel/nvidia/nv-gpu-numa.c
+@@ -140,12 +140,23 @@ static NV_STATUS bad_idea_write_string_to_file(const char *path_to_file,
+ // This is a callback for iterate_dir. The callback records the range of memory
+ // block IDs assigned to this NUMA node. The return values are Linux kernel
+ // errno values, because the caller is Linux's iterate_dir() routine.
+-static int filldir_get_memblock_id(struct dir_context *ctx,
+-                                   const char *name,
+-                                   int name_len,
+-                                   loff_t offset,
+-                                   u64 ino,
+-                                   unsigned int d_type)
++
++#if (LINUX_VERSION_CODE < KERNEL_VERSION(6, 1, 0))
++#define _NV_FGMI_TYPE int
++#define _NV_FGMI_OK 0
++#define _NV_FGMI_ERR -ERANGE
++#else
++#define _NV_FGMI_TYPE bool
++#define _NV_FGMI_OK true
++#define _NV_FGMI_ERR false
++#endif
++
++static _NV_FGMI_TYPE filldir_get_memblock_id(struct dir_context *ctx,
++                                                const char *name,
++                                                int name_len,
++                                                loff_t offset,
++                                                u64 ino,
++                                                unsigned int d_type)
+ {
+     nv_dir_context_t *ats_ctx = container_of(ctx, nv_dir_context_t, ctx);
+     char name_copy[BUF_SIZE];
+@@ -153,10 +164,10 @@ static int filldir_get_memblock_id(struct dir_context *ctx,
+ 
+     // Check if this is a memory node
+     if (!strnstr(name, "memory", name_len))
+-        return 0;
++        return _NV_FGMI_OK;
+ 
+     if (name_len + 1 > BUF_SIZE)
+-        return -ERANGE;
++        return _NV_FGMI_ERR;
+ 
+     strncpy(name_copy, name, name_len);
+     *(name_copy + name_len) = '\0';
+@@ -165,7 +176,7 @@ static int filldir_get_memblock_id(struct dir_context *ctx,
+     if (kstrtoull(name_copy + strlen(MEMBLOCK_PREFIX), 0, &memblock_id) != 0) 
+     {
+         nv_printf(NV_DBG_ERRORS, "memblock_id parsing failed. Path: %s\n", name_copy);
+-        return -ERANGE;
++        return _NV_FGMI_ERR;
+     }
+ 
+     nv_printf(NV_DBG_INFO, "Found memblock entry %llu\n", memblock_id);
+@@ -174,7 +185,7 @@ static int filldir_get_memblock_id(struct dir_context *ctx,
+     ats_ctx->memblock_start_id = min(ats_ctx->memblock_start_id, memblock_id);
+     ats_ctx->memblock_end_id = max(ats_ctx->memblock_end_id, memblock_id);
+ 
+-    return 0;
++    return _NV_FGMI_OK;
+ }
+ 
+ /*
+-- 
+2.42.0
+
