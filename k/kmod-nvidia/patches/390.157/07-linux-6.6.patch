@@ -16,6 +16,3 @@ index 49f2b0a..804a053 100644
  
  #if defined(NV_DRM_DRIVER_HAS_GEM_PRIME_CALLBACKS)
      .gem_prime_export       = nv_drm_gem_prime_export,
--- 
-2.42.0
-

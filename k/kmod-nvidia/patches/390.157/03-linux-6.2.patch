@@ -92,7 +92,7 @@ index 1289cb3..5b6569c 100644
      dev->mode_config.async_page_flip = false;
  
 diff --git a/kernel/nvidia/nv-acpi.c b/kernel/nvidia/nv-acpi.c
-index da9fbc9..dba78cf 100644
+index 88c6aa1..4f5aff4 100644
 --- a/kernel/nvidia/nv-acpi.c
 +++ b/kernel/nvidia/nv-acpi.c
 @@ -23,10 +23,16 @@ static NV_STATUS   nv_acpi_extract_object  (const union acpi_object *, void *, N
@@ -132,6 +132,3 @@ index da9fbc9..dba78cf 100644
  }
  
  static void nv_acpi_event(acpi_handle handle, u32 event_type, void *data)
--- 
-2.41.0
-
