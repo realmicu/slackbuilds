@@ -4,6 +4,7 @@ CWD=$(pwd)
 
 APP=buildah
 VERSION=$(ls $APP-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
+MARCH=${MARCH:-native}
 ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
@@ -21,8 +22,35 @@ REPONAME=$APP
 
 LIBSUFFIX=""
 
+if [ "$MARCH" = "i386" ]; then
+  SLKCFLAGS="-O2 -march=i386 -mtune=i686"
+elif [ "$MARCH" = "i486" ]; then
+  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
+elif [ "$MARCH" = "i586" ]; then
+  SLKCFLAGS="-O2 -march=i586 -mtune=i686"
+elif [ "$MARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=i686"
+elif [ "$MARCH" = "nocona" ]; then
+  SLKCFLAGS="-O2 -march=nocona -mtune=generic -mmmx -msse -msse2 -msse3"
+elif [ "$MARCH" = "core2" ]; then
+  SLKCFLAGS="-O2 -march=core2 -mtune=core2 -mmmx -msse -msse2 -msse3"
+elif [ "$MARCH" = "atom" -o "$MARCH" = "bonnell" ]; then
+  SLKCFLAGS="-O2 -march=bonnell -mmmx -msse -msse2 -msse3 -mssse3 -mcx16 -msahf -mmovbe -mfxsr --param l1-cache-size=24 --param l1-cache-line-size=64 --param l2-cache-size=512 -mtune=bonnell"
+elif [ "$MARCH" = "sandybridge" ]; then
+  SLKCFLAGS="-O2 -march=sandybridge"
+elif [ "$MARCH" = "pentium3" ]; then
+  SLKCFLAGS="-O2 -march=pentium3 -mmmx -msse"
+elif [ "$MARCH" = "pentium2" ]; then
+  SLKCFLAGS="-O2 -march=pentium2 -mmmx"
+elif [ "$MARCH" = "s390" ]; then
+  SLKCFLAGS="-O2"
+else
+  SLKCFLAGS="-O2 -march=$MARCH"
+fi
+
 if [ "$ARCH" = "x86_64" ]; then
   LIBSUFFIX=${LIBSUFFIX:-64}
+  SLKCFLAGS="$SLKCFLAGS -fPIC -m64"
 fi
 
 PKG=$TMP/package-$APP
@@ -77,6 +105,8 @@ fi
 
 # Point go to the location of the source tree
 export GOPATH="$TMP/$APP-$VERSION"
+export CGO_CFLAGS="$SLKCFLAGS"
+export CGO_CXXFLAGS="$SLKCFLAGS"
 
 make all PREFIX="/usr" MANDIR="/usr/man" || exit 1
 make install install.completions DESTDIR="$PKG" PREFIX="/usr" MANDIR="/usr/man" || exit 1
