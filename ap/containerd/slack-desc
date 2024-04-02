@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+          |-----handy-ruler------------------------------------------------------|
+containerd: containerd (industry-standard container runtime)
+containerd:
+containerd: containerd is an industry-standard container runtime with an emphasis
+containerd: on simplicity, robustness, and portability. It is available as
+containerd: a daemon, which can manage the complete container lifecycle of
+containerd: its host system: image transfer and storage, container execution
+containerd: and supervision, low-level storage and network attachments, etc.
+containerd:
+containerd: URL: https://containerd.io/
+containerd:
+containerd:
