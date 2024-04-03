@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt	2024-04-03 14:54:04.777470328 +0200
++++ b/CMakeLists.txt	2024-04-03 15:22:27.269635279 +0200
+@@ -20,6 +20,8 @@
+ 
+ if(NOT EXTERNAL_GUMBO)
+     add_subdirectory(src/gumbo)
++else()
++    include_directories(/usr/include/gumbo)
+ endif()
+ 
+ set(SOURCE_LITEHTML

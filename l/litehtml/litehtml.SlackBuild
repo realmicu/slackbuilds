@@ -30,14 +30,15 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-# fix lib dir:
-if [ ! -z "$LIBSUFFIX" ]; then
-  sed -i -e "s: lib: lib${LIBSUFFIX}:g" CMakeLists.txt src/gumbo/CMakeLists.txt
-fi
+# Fix building with external gumbo-parser:
+patch -p1 < $CWD/external-gumbo-includedir.patch || exit 1
 
-cmake . -DCMAKE_BUILD_TYPE=Release \
-	-DCMAKE_INSTALL_PREFIX=/usr \
-	-DBUILD_TESTING=OFF || exit 1
+cmake . -Wno-dev \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_INSTALL_PREFIX=/usr \
+  -DLIB_SUFFIX="$LIBSUFFIX" \
+  -DLITEHTML_BUILD_TESTING=OFF \
+  -DEXTERNAL_GUMBO=ON || exit 1
 
 $MAKE || exit 1
 make install DESTDIR=$PKG || exit 1
