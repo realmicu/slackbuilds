@@ -1,0 +1,36 @@
+#!/bin/bash
+#
+# Execute commands inside K3S namespace.
+#
+
+K3S_NAME="k3s-server"
+K3S_RUNDIR="/run/k3s"
+
+case $1 in
+  -h|--help|-?|--?|--usage)
+    echo "Execute command in $K3S_NAME namespace (default is shell)."
+    echo "Usage: ${0##*/} [command]"
+    exit 0
+    ;;
+esac
+
+if [ ! -s $K3S_RUNDIR/$K3S_NAME.clientpid ] ; then
+  echo "Error - k3s not running."
+  exit 1
+fi
+
+p0=$(pgrep -F $K3S_RUNDIR/$K3S_NAME.clientpid)
+[ -z "$p0" ] || p1=$(pgrep -P $p0 --full "k3s server")
+[ -z "$p1" ] || p2=$(pgrep -P $p1 --full "/proc/self/exe init")
+
+if [ -z "$p2" ] ; then
+  echo "Error - k3s process missing."
+  exit 2
+fi
+
+if [ -z "$*" ] ; then
+  echo "*** You are now in $K3S_NAME namespace (pid, user, mount, net)."
+  echo "*** Type 'exit' to leave."
+fi
+
+exec /usr/bin/nsenter --pid --user --mount --net --target $p2 $*

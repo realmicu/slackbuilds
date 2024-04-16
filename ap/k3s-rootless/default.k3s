@@ -1,0 +1,22 @@
+# Configuration for rootless K3S (lightweight Kubernetes aka Rancher)
+# Sourced by /etc/rc.d/rc.k3s
+# Note: Requires cgroups v2 (cgroup2 filesystem).
+
+# Mountpoint for cgroups v2:
+CGROUP2_ROOT="/sys/fs/cgroup"
+
+# cgroup2 container hierarchy root:
+CGROUP2_CTR_DIR="containers"
+
+# cgroup2 controllers:
+CGROUP2_CONTROLLERS="cpu cpuset io memory pids"
+
+# User/group for running rootless K3S:
+K3S_USER="k3sadm"
+K3S_GROUP="k3sadm"
+
+# K3S local storage path (for volumes etc - may be relative to user home dir):
+K3S_STORAGE_DIR="storage"
+
+# Extra options for K3S:
+K3S_OPTS="--kubelet-arg=housekeeping-interval=30s --disable traefik --disable-network-policy"

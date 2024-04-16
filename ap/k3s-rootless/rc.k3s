@@ -1,0 +1,213 @@
+#!/bin/bash
+#
+# Start/stop K3S (lightweight Kubernetes aka Rancher)
+#
+# Written for Slackware Linux by Michal 'Micu' Cieslakiewicz <michal.cieslakiewicz@wp.pl>.
+
+# Source default settings:
+if [ -r /etc/default/k3s ]; then
+ . /etc/default/k3s
+else
+  echo "No /etc/default/k3s file. Exiting."
+  exit 1
+fi
+
+# Check if binary is present in standard location:
+if [ ! -x /usr/bin/k3s ] ; then
+  echo "No /usr/bin/k3s command. Exiting."
+  exit 1
+fi
+
+# Internal constants:
+K3S_NAME="k3s-server"
+K3S_RUNDIR="/run/k3s"
+K3S_LOGDIR="/var/log/k3s"
+K3S_CG2_CTR_DIR="$CGROUP2_ROOT/$CGROUP2_CTR_DIR"
+K3S_CG2_USER_DIR="$K3S_CG2_CTR_DIR/user.$K3S_USER"
+
+# Make storage path absolute:
+if [ "$(echo $K3S_STORAGE_DIR | cut -c1)" != "/" ] ; then
+  K3S_STORAGE_DIR=$(awk -F: '$1=="'$K3S_USER'" { print $6 }' /etc/passwd)/$K3S_STORAGE_DIR
+fi
+
+check_cgroup2() {
+  if ! fgrep -wq cgroup2 /proc/filesystems ; then
+    echo "$K3S_NAME error: cgroup2 filesystem not enabled in kernel." > /dev/stderr
+    exit 2
+  fi
+  local m=$(awk '$3=="cgroup2" { print $2 }' /proc/mounts)
+  if [ "$m" != "$CGROUP2_ROOT" ] ; then
+    echo "$K3S_NAME error: cgroup2 filesystem not mounted at $CGROUP2_ROOT." > /dev/stderr
+    exit 3
+  fi
+}
+
+prepare_dirs() {
+  [ -d $K3S_RUNDIR ] || mkdir -pm 750 $K3S_RUNDIR
+  [ -d $K3S_LOGDIR ] || mkdir -pm 755 $K3S_LOGDIR
+  [ -d $K3S_STORAGE_DIR ] || mkdir -pm 750 $K3S_STORAGE_DIR
+  chown -R $K3S_USER:$K3S_GROUP $K3S_RUNDIR $K3S_LOGDIR
+  chown $K3S_USER:$K3S_GROUP $K3S_STORAGE_DIR
+}
+
+prepare_network() {
+  # Networking options for rootless K3S:
+  echo 1 > /proc/sys/net/ipv4/ip_forward
+  echo 1 > /proc/sys/net/bridge/bridge-nf-call-iptables
+}
+
+prepare_machine_id() {
+  # Nice to have, otherwise periodic warning in K3S log appears:
+  if [ ! -s /etc/machine-id ] ; then
+    if [ -s /var/lib/dbus/machine-id ] ; then
+      cat /var/lib/dbus/machine-id > /etc/machine-id
+    else
+      # machine-id is 32 lowercase hex digits:
+      dd if=/dev/urandom bs=4k count=1 2>/dev/null | sha256sum | cut -c1-32 > /etc/machine-id
+    fi
+    chown root:root /etc/machine-id
+    chmod 644 /etc/machine-id
+  fi
+}
+
+prepare_cgroup2() {
+  # Note that hierarchy should be created with cgroup.subtree_control populated:
+  for i in $CGROUP2_CONTROLLERS ; do echo "+$i" > $CGROUP2_ROOT/cgroup.subtree_control ; done
+  [ -d $K3S_CG2_CTR_DIR ] || mkdir -p $K3S_CG2_CTR_DIR
+  for i in $CGROUP2_CONTROLLERS ; do echo "+$i" > $K3S_CG2_CTR_DIR/cgroup.subtree_control ; done
+  [ -d $K3S_CG2_USER_DIR ] || mkdir -p $K3S_CG2_USER_DIR
+  chown $K3S_USER:$K3S_GROUP $K3S_CG2_USER_DIR
+
+  # Allow user access to at least cgroup.subtree_control and cgroup.procs:
+  CG2_KERN_DELEG="$(cat /sys/kernel/cgroup/delegate)"
+  for i in cgroup.subtree_control cgroup.procs ; do
+    if ! echo $CG2_KERN_DELEG | fgrep -wq $i ; then
+      $CG2_KERN_DELEG="$CG2_KERN_DELEG $i"
+    fi
+  done #i
+  ( cd $K3S_CG2_USER_DIR && chown $K3S_USER:$K3S_GROUP $CG2_KERN_DELEG )
+}
+
+delegate_pid() {
+  echo $1 > $K3S_CG2_USER_DIR/cgroup.procs
+}
+
+log() {
+  echo "$(date -Iseconds)   $*" >> $K3S_LOGDIR/$K3S_NAME.log
+}
+
+clean_cgroup2() {
+  # Remove cgroup2 directory structure.
+  # rmdir should be used as 'rm -rf' does not work as expected for cgroup2 dirs.
+  # Wait for shutdown of all processes delegated to cgroups marked for deletion
+  # otherwise dir removal will fail.
+
+  [ -d $K3S_CG2_CTR_DIR ] || return
+  for i in $(find $K3S_CG2_CTR_DIR -type d | sort -r) ; do
+    while [ ! -z "$(cat $i/cgroup.procs)" ] ; do sleep 0.1 ; done
+    rmdir $i
+  done #i
+}
+
+adjust_oom() {
+  # Adjust Out-Of-Memory killer for main k3s processes.
+  # This stops following warning from spamming log every 1 min:
+  # "Failed to ensure state" containerName="/k3s" err="failed to apply oom score -999 to PID ...
+
+  # 'k3s: k3s init' -> 'k3s server' -> '/proc/self/exe init' -> 'k3s server' -> 'k3s server'
+  while [ ! -f $K3S_RUNDIR/$K3S_NAME.clientpid ] ; do sleep 0.1 ; done
+  p0=$(pgrep -F $K3S_RUNDIR/$K3S_NAME.clientpid)
+  while true ; do
+    [ -z "$p0" ] && [ -z "$p1" ] || p1=$(pgrep -P $p0 --full "k3s server")
+    [ -z "$p1" ] && [ -z "$p2" ] || p2=$(pgrep -P $p1 --full "/proc/self/exe init")
+    [ -z "$p2" ] && [ -z "$p3" ] || p3=$(pgrep -P $p2 --full "k3s server")
+    [ -z "$p3" ] && [ -z "$p4" ] || p4=$(pgrep -P $p3 --full "k3s server")
+    [ -z "$p4" ] || break
+    sleep 0.1
+  done
+  for i in $p0 $p1 $p2 $p3 $p4 ; do
+    echo "-999" > /proc/$i/oom_score_adj
+  done #i
+}
+
+k3s_start() {
+  check_cgroup2
+
+  echo -n "Starting $K3S_NAME ... "
+
+  prepare_dirs
+  log "*** Startup ***"
+  prepare_network
+  prepare_machine_id
+  prepare_cgroup2
+  delegate_pid $$
+
+  su $K3S_USER -c "daemon -v -N -P $K3S_RUNDIR -n $K3S_NAME -- \
+    k3s server --rootless \
+      --default-local-storage-path $K3S_STORAGE_DIR \
+      --log $K3S_LOGDIR/$K3S_NAME.log \
+      --default-runtime crun \
+      --kubelet-arg=node-ip=0.0.0.0 \
+      --kube-controller-manager-arg=bind-address=0.0.0.0 \
+      --kube-proxy-arg=metrics-bind-address=0.0.0.0 \
+      --kube-scheduler-arg=bind-address=0.0.0.0 \
+      $K3S_OPTS"
+
+  adjust_oom
+
+  echo "done."
+}
+
+k3s_stop() {
+  echo -n "Stopping $K3S_NAME ... "
+
+  if [ -d $K3S_RUNDIR ] ; then
+    su $K3S_USER -c "daemon -v -N -P $K3S_RUNDIR -n $K3S_NAME --stop"
+    while [ -f $K3S_RUNDIR/$K3S_NAME.pid ] ; do sleep 1 ; done
+  fi
+  clean_cgroup2
+  log "*** Shutdown ***"
+
+  echo "done."
+}
+
+k3s_restart() {
+  k3s_stop
+  sleep 2
+  k3s_start
+}
+
+k3s_status() {
+  if [ -d $K3S_RUNDIR ] ; then
+    su $K3S_USER -c "daemon -v -N -P $K3S_RUNDIR -n $K3S_NAME --running"
+  fi
+}
+
+k3s_clean() {
+  echo -n "Cleaning run dir and cgroup2 for $K3S_NAME ... "
+
+  ( cd $K3S_RUNDIR && rm -rf * )
+  clean_cgroup2
+
+  echo "done."
+}
+
+case "$1" in
+'start')
+  k3s_start
+  ;;
+'stop')
+  k3s_stop
+  ;;
+'restart')
+  k3s_restart
+  ;;
+'status')
+  k3s_status
+  ;;
+'clean')
+  k3s_clean
+  ;;
+*)
+  echo "usage $0 start|stop|restart|status|clean"
+esac

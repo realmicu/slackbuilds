@@ -1,0 +1,5 @@
+/var/log/k3s/k3s-server.log {
+  daily
+  su k3sadm k3sadm
+  copytruncate
+}

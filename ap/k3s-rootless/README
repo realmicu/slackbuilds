@@ -1,0 +1,54 @@
+
+This is README file for k3s-rootless installer.
+
+Author: Michal 'Micu' Cieslakiewicz <michal.cieslakiewicz@wp.pl>
+
+
+
+How to install K3S using this package:
+
+0. Make Cgroup v2 mounted on boot.
+
+   * Example patch to enable Cgroup v2 in Slackware 15.0 :
+
+================================================================================
+--- a/etc/rc.d/rc.S	2022-01-27 23:32:52.000000000 +0100
++++ b/etc/rc.d/rc.S	2024-03-28 23:40:01.899329987 +0100
+@@ -55,7 +55,9 @@
+ 
+ # Mount Control Groups filesystem interface:
+ if [ -z "$container" ]; then
+-  if grep -wq cgroup /proc/filesystems ; then
++  if grep -wq cgroup2 /proc/filesystems ; then
++    mount -t cgroup2 cgroup2 /sys/fs/cgroup
++  elif grep -wq cgroup /proc/filesystems ; then
+     if [ -d /sys/fs/cgroup ]; then
+       # See linux-*/Documentation/cgroups/cgroups.txt (section 1.6)
+       # Check if we have some tools to autodetect the available cgroup controllers
+================================================================================
+
+1. Execute /usr/sbin/k3s-install to fetch latest version of binary and
+   install it as /usr/bin/k3s (bash completion is updated as well).
+
+2. Adjust configuration stored in /etc/default/k3s.
+
+3. Enable startup/shutdown script.
+
+   * Add to /etc/rc.d/rc.local :
+
+================================================================================
+# Start K3S:
+if [ -x /etc/rc.d/rc.k3s ]; then
+  /etc/rc.d/rc.k3s start
+fi
+================================================================================
+
+   * Add to /etc/rc.d/rc.local_shutdown :
+
+================================================================================
+# Stop K3S:
+if [ -x /etc/rc.d/rc.k3s ]; then
+  /etc/rc.d/rc.k3s stop
+fi
+================================================================================
+

@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+            |-----handy-ruler------------------------------------------------------|
+k3s-rootless: k3s-rootless (installer for K3S in rootless mode)
+k3s-rootless:
+k3s-rootless: This package provides Slackware setup for K3S (originally Rancher),
+k3s-rootless: a lightweight Kubernetes implementation bundled into single binary.
+k3s-rootless: The binary itself is not part of the package. It can be downloaded
+k3s-rootless: and installed by running 'k3s-install' command. Startup script,
+k3s-rootless: default configuration and logrotate files are included. K3S is
+k3s-rootless: run by dedicated user in rootless mode. Also 'k3s-cmd' script
+k3s-rootless: is provided for executing commands in the running K3S instance
+k3s-rootless: namespace.
+k3s-rootless: Note: rootless K3S requires Cgroup v2.

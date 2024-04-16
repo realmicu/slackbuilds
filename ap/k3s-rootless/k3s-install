@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# Download and install selected version of K3S.
+#
+
+BASE_URL="https://github.com/k3s-io/k3s/releases"
+DEST_DIR="/usr/bin"
+
+case $1 in
+  -h|--help|-?|--?|--usage)
+    echo "Download and install K3S binary."
+    echo "Usage: ${0##*/} [version|--help|--check]"
+    echo -e "\nVersion example: v1.29.3+k3s1 (see https://github.com/k3s-io/k3s/releases)"
+    echo "If no version is specified, the latest one is downloaded."
+    exit 0
+    ;;
+  ""|--check)
+    K3S_VERSION="$(curl -sI "$BASE_URL/latest" | awk '$1=="location:" { print $2 }' | rev | cut -d/ -f1 | rev | tr -d '\r')"
+    if [ ! -z "$1" ] ; then
+      echo "Latest k3s version: $K3S_VERSION"
+      exit 0
+    fi
+    ;;
+  *)
+    K3S_VERSION="$1"
+    ;;
+esac
+
+K3S_ARCH=""
+case $(uname -m) in
+  aarch64)
+    K3S_ARCH="-arm64"
+    ;;
+  arm*)
+    K3S_ARCH="-armhf"
+    ;;
+esac
+
+echo "Installing k3s binary version $K3S_VERSION in $DEST_DIR ..."
+
+f=$(mktemp -p $DEST_DIR -t k3s.XXXXXXXX)
+if [ -z "$f" ] ; then
+  echo "Error: cannot create temporary file. Installation failed." > /dev/stderr
+  exit 2
+fi
+
+wget -qO $f "${BASE_URL}/download/${K3S_VERSION/+/%2B}/k3s$K3S_ARCH"
+if file $f | fgrep -qw ELF ; then
+  cat $f > $DEST_DIR/k3s
+  chown root:root $DEST_DIR/k3s
+  chmod 755 $DEST_DIR/k3s
+  rm -f $f
+else
+  echo "Error: downloaded file is not in ELF format. Installation failed." > /dev/stderr
+  rm -f $f
+  exit 3
+fi
+
+/usr/bin/k3s completion bash > /etc/bash_completion.d/k3s
+
+echo "Installation completed successfully."
+
+echo -e "\nVersion installed:"
+/usr/bin/k3s -v
