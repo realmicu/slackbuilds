@@ -6,23 +6,39 @@
 BASE_URL="https://github.com/k3s-io/k3s/releases"
 DEST_DIR="/usr/bin"
 
+get_k3s_versions() {
+  INST_K3S_VER=""
+  LAT_K3S_VER=""
+  LAT_K3S_VER="$(curl -sI "$BASE_URL/latest" | awk '$1=="location:" { print $2 }' | rev | cut -d/ -f1 | rev | tr -d '\r')"
+  [ -x $DEST_DIR/k3s ] && INST_K3S_VER=$(k3s -v | awk '$1=="k3s" { print $3 }')
+  echo "Installed version : ${INST_K3S_VER:-(none)}"
+  echo "Latest version    : ${LAT_K3S_VER:-(none)}"
+}
+
 case $1 in
-  -h|--help|-?|--?|--usage)
-    echo "Download and install K3S binary."
-    echo "Usage: ${0##*/} [version|--help|--check]"
-    echo -e "\nVersion example: v1.29.3+k3s1 (see https://github.com/k3s-io/k3s/releases)"
-    echo "If no version is specified, the latest one is downloaded."
-    exit 0
-    ;;
-  ""|--check)
-    K3S_VERSION="$(curl -sI "$BASE_URL/latest" | awk '$1=="location:" { print $2 }' | rev | cut -d/ -f1 | rev | tr -d '\r')"
-    if [ ! -z "$1" ] ; then
-      echo "Latest k3s version: $K3S_VERSION"
+  -i|--install)
+    get_k3s_versions
+    K3S_VERSION=${2:-$LAT_K3S_VER}
+    if [ "$K3S_VERSION" == "$INST_K3S_VER" ] ; then
+      echo -e "\nRequested version is the same as the installed one."
       exit 0
     fi
     ;;
+  "")
+    get_k3s_versions
+    if [ "$INST_K3S_VER" == "$LAT_K3S_VER"  ]  ; then
+      echo -e "\nLatest version is installed."
+    else
+      echo -e "\nNew version is available. You can install it by running '${0##*/} -i' as root."
+    fi
+    exit 0
+    ;;
   *)
-    K3S_VERSION="$1"
+    echo "Download and install K3S binary."
+    echo "Usage: ${0##*/} [--help|--install [version]]"
+    echo -e "\nVersion example: v1.29.3+k3s1 (see https://github.com/k3s-io/k3s/releases)"
+    echo "If no version is specified, the latest one is downloaded."
+    exit 0
     ;;
 esac
 
