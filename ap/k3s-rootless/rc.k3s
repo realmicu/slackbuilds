@@ -97,14 +97,19 @@ log() {
 }
 
 clean_cgroup2() {
-  # Remove cgroup2 directory structure.
+  # Remove cgroup2 directory structure and stop all processes delegated there.
   # rmdir should be used as 'rm -rf' does not work as expected for cgroup2 dirs.
-  # Wait for shutdown of all processes delegated to cgroups marked for deletion
-  # otherwise dir removal will fail.
+  # Process list for each subdirectory must be empty when rmdir happens otherwise
+  # dir removal will fail.
 
   [ -d $K3S_CG2_CTR_DIR ] || return
   for i in $(find $K3S_CG2_CTR_DIR -type d | sort -r) ; do
-    while [ ! -z "$(cat $i/cgroup.procs)" ] ; do sleep 0.1 ; done
+    p=$(cat $i/cgroup.procs)
+    if [ ! -z "$p" ] ; then
+      # Move processes to root hirearchy then send TERM signal
+      echo $p > $CGROUP2_ROOT/cgroup.procs
+      kill -TERM $p 1>/dev/null 2>&1
+    fi
     rmdir $i
   done #i
 }
