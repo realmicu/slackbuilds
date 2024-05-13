@@ -151,7 +151,6 @@ k3s_start() {
     k3s server --rootless \
       --default-local-storage-path $K3S_STORAGE_DIR \
       --log $K3S_LOGDIR/$K3S_NAME.log \
-      --default-runtime crun \
       --kubelet-arg=node-ip=0.0.0.0 \
       --kube-controller-manager-arg=bind-address=0.0.0.0 \
       --kube-proxy-arg=metrics-bind-address=0.0.0.0 \
