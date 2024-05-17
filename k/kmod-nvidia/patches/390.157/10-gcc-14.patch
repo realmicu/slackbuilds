@@ -1,0 +1,43 @@
+diff --git a/kernel/Kbuild b/kernel/Kbuild
+index 2e19f2b..748fabf 100644
+--- a/kernel/Kbuild
++++ b/kernel/Kbuild
+@@ -65,7 +65,7 @@ EXTRA_CFLAGS += -I$(src)/common/inc
+ EXTRA_CFLAGS += -I$(src)
+ EXTRA_CFLAGS += -Wall -MD $(DEFINES) $(INCLUDES) -Wsign-compare -Wno-cast-qual -Wno-error
+ EXTRA_CFLAGS += -D__KERNEL__ -DMODULE -DNVRM -DNV_VERSION_STRING=\"390.157\" -Wno-unused-function -Wuninitialized -fno-strict-aliasing -mno-red-zone -mcmodel=kernel -DNV_UVM_ENABLE -Wno-sign-compare -Wno-format-extra-args
+-EXTRA_CFLAGS += -Wno-attribute-warning -Wno-missing-declarations -Wno-missing-prototypes
++EXTRA_CFLAGS += -Wno-attribute-warning -Wno-missing-declarations -Wno-missing-prototypes -Wno-int-conversion
+ EXTRA_CFLAGS += $(call cc-option,-Werror=undef,)
+ EXTRA_CFLAGS += -DNV_SPECTRE_V2=$(NV_SPECTRE_V2)
+ EXTRA_CFLAGS += -DNV_KERNEL_INTERFACE_LAYER
+diff --git a/kernel/conftest.sh b/kernel/conftest.sh
+index d672ebc..99bae4e 100755
+--- a/kernel/conftest.sh
++++ b/kernel/conftest.sh
+@@ -153,7 +153,9 @@ test_headers() {
+ build_cflags() {
+     BASE_CFLAGS="-O2 -D__KERNEL__ \
+ -DKBUILD_BASENAME=\"#conftest$$\" -DKBUILD_MODNAME=\"#conftest$$\" \
+--nostdinc -isystem $ISYSTEM"
++-nostdinc -isystem -fshort-wchar $ISYSTEM \
++-Wno-implicit-function-declaration -Wno-strict-prototypes \
++-Wno-int-conversion"
+ 
+     if [ "$OUTPUT" != "$SOURCES" ]; then
+         OUTPUT_CFLAGS="-I$OUTPUT/include2 -I$OUTPUT/include"
+@@ -4513,8 +4515,13 @@ compile_test() {
+             #
+             CODE="
+             #include <drm/drm_gem.h>
++            #if defined(NV_LINUX_IOSYS_MAP_H_PRESENT)
++            typedef struct iosys_map nv_sysio_map_t;
++            #else
++            typedef struct dma_buf_map nv_sysio_map_t;
++            #endif
+             int conftest_drm_gem_object_vmap_has_map_arg(
+-                    struct drm_gem_object *obj, struct dma_buf_map *map) {
++                    struct drm_gem_object *obj, nv_sysio_map_t *map) {
+                 return obj->funcs->vmap(obj, map);
+             }"
+ 
