@@ -63,9 +63,6 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-# Backport fmt-10.0.0 compilation fix:
-patch -p1 < $CWD/fix_fmt_10.patch
-
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
 ./configure --prefix=/usr \
