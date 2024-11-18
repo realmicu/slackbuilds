@@ -1,6 +1,6 @@
 #!/bin/bash
 SRC=claws-mail
-VERSION=4.2.0
+VERSION=4.3.0
 set -x
 wget -O ${SRC}-${VERSION}.tar.xz -c "https://www.claws-mail.org/download.php?file=releases/${SRC}-${VERSION}.tar.xz"
 rm -rf themes && mkdir themes || exit 1
