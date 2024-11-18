@@ -40,12 +40,6 @@ cmake . \
       -DENABLE_UPDATE_CHECKER=FALSE \
       -DCUSTOM_MANDIR=/usr/man || exit 1
 
-# Patch for GCC v14:
-CMAKE_CXX="$(fgrep -w "CMAKE_CXX_COMPILER:FILEPATH" CMakeCache.txt | cut -d= -f2)"
-if [ "$($CMAKE_CXX --version | fgrep -w "c++ (GCC)" | cut -d' ' -f3 | cut -d. -f1)" == "14" ] ; then
-  patch -p1 < $CWD/gcc-14-include-header.patch || exit 1
-fi
-
 $MAKE || exit 1
 make install DESTDIR=$PKG || exit 1
 
