@@ -71,7 +71,6 @@
 	i3	i3blocks			# i3wm
 	ap	vifm
 	l	libslirp			# podman
-	l	libseccomp			# podman
 	ap	slirp4netns			# podman
 	ap	conmon				# podman
 	ap	go-md2man			# podman

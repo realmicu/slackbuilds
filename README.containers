@@ -3,7 +3,6 @@ Container packages (in build order):
 
   l/yajl
   l/libslirp
-  l/libseccomp
   ap/slirp4netns
   ap/conmon
   ap/go-md2man
