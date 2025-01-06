@@ -1,0 +1,34 @@
+diff --git a/kernel/nvidia-modeset/nvidia-modeset-linux.c b/kernel/nvidia-modeset/nvidia-modeset-linux.c
+index f7f1def..72532d8 100644
+--- a/kernel/nvidia-modeset/nvidia-modeset-linux.c
++++ b/kernel/nvidia-modeset/nvidia-modeset-linux.c
+@@ -37,7 +37,11 @@
+ 
+ #include "nv-time.h"
+ 
+-#if !defined(CONFIG_RETPOLINE)
++/*
++ * Commit aefb2f2e619b ("x86/bugs: Rename CONFIG_RETPOLINE =>
++ * CONFIG_MITIGATION_RETPOLINE) in v6.8 renamed CONFIG_RETPOLINE.
++ */
++#if !defined(CONFIG_RETPOLINE) && !defined(CONFIG_MITIGATION_RETPOLINE)
+ #include "nv-retpoline.h"
+ #endif
+ 
+diff --git a/kernel/nvidia/nv.c b/kernel/nvidia/nv.c
+index 4fa9c23..cfc12eb 100644
+--- a/kernel/nvidia/nv.c
++++ b/kernel/nvidia/nv.c
+@@ -32,7 +32,11 @@
+ #include "nv-kthread-q.h"
+ #include "nv-pat.h"
+ 
+-#if !defined(CONFIG_RETPOLINE)
++/*
++ * Commit aefb2f2e619b ("x86/bugs: Rename CONFIG_RETPOLINE =>
++ * CONFIG_MITIGATION_RETPOLINE) in v6.8 renamed CONFIG_RETPOLINE.
++ */
++#if !defined(CONFIG_RETPOLINE) && !defined(CONFIG_MITIGATION_RETPOLINE)
+ #include "nv-retpoline.h"
+ #endif
+ 
