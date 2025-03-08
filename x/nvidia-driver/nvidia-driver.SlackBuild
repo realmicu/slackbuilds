@@ -71,7 +71,8 @@ cp -av nvidia-drm-outputclass.conf \
   $PKG/usr/share/X11/xorg.conf.d/20-nvidia-drm-outputclass.conf
 sed -e 's:__UTILS_PATH__:/usr/bin:' -e 's:__PIXMAP_PATH__:/usr/share/pixmaps:' \
   nvidia-settings.desktop > $PKG/usr/share/applications/nvidia-settings.desktop
-cp -av 10_nvidia_wayland.json $PKG/usr/share/egl/egl_external_platform.d
+sed -e 's/"\(library_path\)" : "\(libnvidia-egl-wayland.so\).1"/"\1" : "\2\.1\.0\.2"/' \
+  10_nvidia_wayland.json > $PKG/usr/share/egl/egl_external_platform.d/20_nvidia_legacy_wayland.json
 cp -av 10_nvidia.json $PKG/usr/share/glvnd/egl_vendor.d
 cp -av nvidia-application-profiles-${VERSION}-key-documentation \
   nvidia-application-profiles-${VERSION}-rc $PKG/usr/share/nvidia
@@ -104,7 +105,6 @@ cp -av nvidia-settings.png $PKG/usr/share/pixmaps
   ln -s libOpenCL.so.1.0.0 libOpenCL.so.1.0
   ln -s libOpenCL.so.1.0 libOpenCL.so.1
   ln -s libOpenCL.so.1 libOpenCL.so
-  ln -s libnvidia-egl-wayland.so.1.0.2 libnvidia-egl-wayland.so.1
 )
 ( cd $PKG/usr/lib${LIBSUFFIX}/vdpau
   ln -s libvdpau_nvidia.so.$VERSION libvdpau_nvidia.so.1
