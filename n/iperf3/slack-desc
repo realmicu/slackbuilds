@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+      |-----handy-ruler------------------------------------------------------|
+iperf3: iperf3 (TCP, UDP, and SCTP network bandwidth measurement tool)
+iperf3:
+iperf3: A tool for active measurements of the maximum achievable bandwidth
+iperf3: on IP networks. It supports tuning of various parameters related to
+iperf3: timing, protocols, and buffers. For each test it reports the measured
+iperf3: throughput / bitrate, loss, and other parameters.
+iperf3:
+iperf3: URL: https://software.es.net/iperf/
+iperf3:
+iperf3:
+iperf3:
