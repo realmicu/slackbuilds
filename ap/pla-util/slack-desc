@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+        |-----handy-ruler------------------------------------------------------|
+pla-util: pla-util (power line adapter utility)
+pla-util:
+pla-util: The purpose of this program is to allow Linux users to manage
+pla-util: HomePlug AV2 compliant power line adapters that use a Broadcom
+pla-util: system-on-a-chip (SoC) such as the BCM60500 or BCM60333.
+pla-util:
+pla-util: URL: https://github.com/serock/pla-util
+pla-util:
+pla-util:
+pla-util:
+pla-util:

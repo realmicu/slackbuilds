@@ -1,0 +1,22 @@
+diff --git a/Makefile b/Makefile
+index e4268cb..ff9c3a7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -24,7 +24,7 @@ GNATMAKE ?= gnatmake
+ GNATBIND ?= gnatbind
+ GNATLINK ?= gnatlink
+ GNATMAKEFLAGS ?= -v
+-GNATBINDFLAGS ?= -v -Es -shared
++GNATBINDFLAGS ?= -v -Es -static
+ GNATLINKFLAGS ?= -v
+ ADAFLAGS ?= -g -gnateE -gnato -O3 -gnatn
+ LDFLAGS ?= -v
+@@ -44,7 +44,7 @@ gnatlinkflags = -R
+ adaflags = -gnat12 -gnatW8 -gnateu -gnata \
+ 	   -fPIE -fstack-check -fstack-protector-strong
+ ldlibs = -lpcap
+-ldflags = -pie -z relro -z now
++ldflags = -z relro -z now
+ 
+ export ADA_INCLUDE_PATH = ./cli/src:./pla/src:./net/src:./common/src:./config
+ 
