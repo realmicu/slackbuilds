@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+      |-----handy-ruler------------------------------------------------------|
+chrony: chrony (Network Time Protocol server and utilities)
+chrony:
+chrony: chrony is a versatile implementation of the Network Time Protocol.
+chrony: It can synchronise the system clock with NTP servers, reference clocks
+chrony: (e.g. GPS receiver), and manual input using wristwatch and keyboard.
+chrony: It can also operate as an NTPv4 (RFC 5905) server and peer to provide
+chrony: a time service to other computers in the network.
+chrony:
+chrony: URL: https://chrony-project.org/
+chrony:
+chrony:

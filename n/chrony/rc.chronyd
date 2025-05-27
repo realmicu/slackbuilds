@@ -1,0 +1,55 @@
+#!/bin/sh
+#
+# /etc/rc.d/rc.chronyd
+#
+# A modern NTP server.
+#
+
+CHRONYD_CMD="/usr/sbin/chronyd"
+CHRONYD_CONF="/etc/chrony/chronyd.conf"
+CHRONYD_PID="/run/chrony/chronyd.pid"
+CHRONYD_USER="ntp"
+
+CHRONYD_OPTS=""
+
+chronyd_start() {
+  if [ -x $CHRONYD_CMD -a -r $CHRONYD_CONF ]; then
+    RUNDIR=$(dirname $CHRONYD_PID)
+    if [ ! -d $RUNDIR ]; then
+      mkdir -pm 750 $RUNDIR
+      chown $CHRONYD_USER $RUNDIR
+    fi
+    CMD="$CHRONYD_CMD -u $CHRONYD_USER $CHRONYD_OPTS"
+    echo "Starting chronyd:  $CMD"
+    $CMD
+  fi
+}
+
+chronyd_stop() {
+  echo "Stopping chronyd."
+  if [ -r $CHRONYD_PID ]; then
+    kill $(cat $CHRONYD_PID)
+  else
+    killall chronyd
+  fi
+}
+
+chronyd_restart() {
+  chronyd_stop
+  sleep 1
+  chronyd_start
+}
+
+case "$1" in
+'start')
+  chronyd_start
+  ;;
+'stop')
+  chronyd_stop
+  ;;
+'restart')
+  chronyd_restart
+  ;;
+*)
+  echo "Usage: $0 {start|stop|restart}"
+esac
