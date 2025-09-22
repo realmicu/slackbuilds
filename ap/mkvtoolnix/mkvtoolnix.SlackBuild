@@ -70,8 +70,6 @@ CXXFLAGS="$SLKCFLAGS" \
 	    --localstatedir=/var \
 	    --mandir=/usr/man \
 	    --libdir=/usr/lib$LIBSUFFIX \
-	    --enable-qt5 \
-	    --disable-qt6 \
 	    --disable-gui \
 	    --disable-update-check \
 	    --with-boost \
