@@ -8,12 +8,13 @@ TAG=${TAG:-micu}
 TMP=${TMP:-/tmp}
 OUTDIR=${OUTDIR:-$TMP}
 NUMJOBS=${NUMJOBS:-"-j$(expr $(nproc) + 1)"}
+BUILDABI=""
 
 # Automatically determine the architecture we're building on:
 if [ -z "$ARCH" ]; then
   case "$(uname -m)" in
     i?86) ARCH=i686 ;;
-    arm*) readelf /usr/bin/file -A | grep -E -q "Tag_CPU.*[4,5]" && ARCH=arm || ARCH=armv7hl ;;
+    arm*) readelf /usr/bin/file -A | grep -E -q "Tag_CPU.*[4,5]" && ARCH=arm || ARCH=armv7hl ; BUILDABI="-gnueabi" ;;
     # Unless $ARCH is already set, use uname -m for all other archs:
     *) ARCH=$(uname -m) ;;
   esac
@@ -64,7 +65,7 @@ CFLAGS="$SLKCFLAGS" \
 	    --disable-parport \
 	    --enable-linuxgpio \
 	    --disable-doc \
-	    --build=$ARCH-slackware-linux || exit 1
+	    --build=$ARCH-slackware-linux${BUILDABI} || exit 1
 
 make $NUMJOBS || exit 1
 make install DESTDIR=$PKG || exit 1
