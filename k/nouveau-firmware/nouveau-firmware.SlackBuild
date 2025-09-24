@@ -1,6 +1,5 @@
 #!/bin/sh
-# Set initial variables:
-CWD=$(pwd)
+cd $(dirname $0) ; CWD=$(pwd)
 
 APP=nouveau-firmware
 BINDIST=NVIDIA-Linux-x86_64
@@ -21,9 +20,11 @@ cd $APP-$VERSION || exit 1
 $CWD/${BINDIST}-${VERSION}.run -x || exit 1
 $CWD/extract_firmware.py || exit 1
 chown -R root:root .
-find . -perm 444 -exec chmod 644 {} \;
-find . -perm 777 -exec chmod 755 {} \;
-find . -perm 666 -exec chmod 644 {} \;
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \+ -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \+
 mkdir -p $PKG/lib/firmware/nouveau || exit 1
 mv -v nv* vuc-* $PKG/lib/firmware/nouveau || exit 1
 chmod 644 $PKG/lib/firmware/nouveau/{nv,vuc-}*
