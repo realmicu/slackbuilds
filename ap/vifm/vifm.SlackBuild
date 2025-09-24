@@ -1,50 +1,43 @@
 #!/bin/sh
-# Set initial variables:
-CWD=$(pwd)
+cd $(dirname $0) ; CWD=$(pwd)
 
 APP=vifm
 VERSION=$(ls $APP-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
-MARCH=${MARCH:-native}
-ARCH=${ARCH:-x86_64}
 BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
 TMP=${TMP:-/tmp}
 OUTDIR=${OUTDIR:-$TMP}
+NUMJOBS=${NUMJOBS:-"-j$(expr $(nproc) + 1)"}
 
-LIBSUFFIX=""
+# Automatically determine the architecture we're building on:
+if [ -z "$ARCH" ]; then
+  case "$(uname -m)" in
+    i?86) ARCH=i686 ;;
+    arm*) readelf /usr/bin/file -A | grep -E -q "Tag_CPU.*[4,5]" && ARCH=arm || ARCH=armv7hl ;;
+    # Unless $ARCH is already set, use uname -m for all other archs:
+    *) ARCH=$(uname -m) ;;
+  esac
+  export ARCH
+fi
 
-if [ "$MARCH" = "i386" ]; then
-  SLKCFLAGS="-O2 -march=i386 -mtune=i686"
-elif [ "$MARCH" = "i486" ]; then
-  SLKCFLAGS="-O2 -march=i486 -mtune=i686"
-elif [ "$MARCH" = "i586" ]; then
+if [ "$ARCH" = "i586" ]; then
   SLKCFLAGS="-O2 -march=i586 -mtune=i686"
-elif [ "$MARCH" = "i686" ]; then
-  SLKCFLAGS="-O2 -march=i686"
-elif [ "$MARCH" = "nocona" ]; then
-  SLKCFLAGS="-O2 -march=nocona -mtune=generic -mmmx -msse -msse2 -msse3"
-elif [ "$MARCH" = "core2" ]; then
-  SLKCFLAGS="-O2 -march=core2 -mtune=core2 -mmmx -msse -msse2 -msse3"
-elif [ "$MARCH" = "atom" -o "$MARCH" = "bonnell" ]; then
-  SLKCFLAGS="-O2 -march=bonnell -mmmx -msse -msse2 -msse3 -mssse3 -mcx16 -msahf -mmovbe -mfxsr --param l1-cache-size=24 --param l1-cache-line-size=64 --param l2-cache-size=512 -mtune=bonnell"
-elif [ "$MARCH" = "sandybridge" ]; then
-  SLKCFLAGS="-O2 -march=sandybridge"
-elif [ "$MARCH" = "pentium3" ]; then
-  SLKCFLAGS="-O2 -march=pentium3 -mmmx -msse"
-elif [ "$MARCH" = "pentium2" ]; then
-  SLKCFLAGS="-O2 -march=pentium2 -mmmx"
-elif [ "$MARCH" = "s390" ]; then
-  SLKCFLAGS="-O2"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=pentium4 -mtune=generic"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -march=x86-64 -mtune=generic -fPIC"
+  LIBDIRSUFFIX="64"
 else
-  SLKCFLAGS="-O2 -march=$MARCH"
+  SLKCFLAGS="-O2"
+  LIBDIRSUFFIX=""
 fi
 
-if [ "$ARCH" = "x86_64" ]; then
-  LIBSUFFIX=${LIBSUFFIX:-64}
-  SLKCFLAGS="$SLKCFLAGS -fPIC -m64"
+# Native build override:
+if [ -n "$SLKBUILD_NATIVE" ]; then
+  SLKCFLAGS="-O2 -march=native $SLKBUILD_CFLAGS"
 fi
-
-MAKE="make -j $(nproc)"
 
 PKG=$TMP/package-$APP
 rm -rf $PKG
@@ -54,9 +47,11 @@ rm -rf $APP-$VERSION
 tar xf $CWD/$APP-$VERSION.tar.?z* || exit 1
 cd $APP-$VERSION || exit 1
 chown -R root:root .
-find . -perm 444 -exec chmod 644 {} \;
-find . -perm 777 -exec chmod 755 {} \;
-find . -perm 666 -exec chmod 644 {} \;
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \+ -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \+
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
@@ -64,15 +59,15 @@ CXXFLAGS="$SLKCFLAGS" \
 	    --sysconfdir=/etc \
 	    --localstatedir=/var \
 	    --mandir=/usr/man \
-	    --libdir=/usr/lib$LIBSUFFIX \
+	    --libdir=/usr/lib$LIBDIRSUFFIX \
 	    --docdir=/usr/doc/$APP-$VERSION \
 	    --build=$ARCH-slackware-linux || exit 1
 
-$MAKE || exit 1
+make $NUMJOBS || exit 1
 make install DESTDIR=$PKG || exit 1
 
 # Don't ship .la files:
-rm -f $PKG/{,usr/}lib${LIBSUFFIX}/*.la
+rm -f $PKG/{,usr/}lib${LIBDIRSUFFIX}/*.la
 
 chown -R root:bin $PKG/usr/bin $PKG/usr/sbin
 
