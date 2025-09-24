@@ -1,6 +1,5 @@
 #!/bin/sh
-# Set initial variables:
-CWD=$(pwd)
+cd $(dirname $0) ; CWD=$(pwd)
 
 APP=quilt
 VERSION=$(ls $APP-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
@@ -9,10 +8,12 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
 TMP=${TMP:-/tmp}
 OUTDIR=${OUTDIR:-$TMP}
+NUMJOBS=${NUMJOBS:-"-j$(expr $(nproc) + 1)"}
+LIBDIRSUFFIX=""
 
-LIBSUFFIX=${LIBSUFFIX:-64}
-
-MAKE="make -j $(nproc)"
+if [ "$(uname -m)" = "x86_64" ]; then
+  LIBDIRSUFFIX="64"
+fi
 
 PKG=$TMP/package-$APP
 rm -rf $PKG
@@ -22,22 +23,24 @@ rm -rf $APP-$VERSION
 tar xvf $CWD/$APP-$VERSION.tar.?z* || exit 1
 cd $APP-$VERSION
 chown -R root:root .
-find . -perm 444 -exec chmod 644 {} \;
-find . -perm 777 -exec chmod 755 {} \;
-find . -perm 666 -exec chmod 644 {} \;
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \+ -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \+
 
 ./configure --prefix=/usr \
 	    --sysconfdir=/etc \
 	    --localstatedir=/var/lib \
 	    --mandir=/usr/man \
-	    --libdir=/usr/lib$LIBSUFFIX \
+	    --libdir=/usr/lib$LIBDIRSUFFIX \
 	    --docdir=/usr/doc/$APP-$VERSION || exit 1
 
-$MAKE || exit 1
+make $NUMJOBS || exit 1
 make install BUILD_ROOT=$PKG || exit 1
 
 # Don't ship .la files:
-rm -f $PKG/{,usr/}lib${LIBSUFFIX}/*.la
+rm -f $PKG/{,usr/}lib${LIBDIRSUFFIX}/*.la
 
 chown -R root:bin $PKG/usr/bin
 
