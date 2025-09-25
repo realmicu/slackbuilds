@@ -33,9 +33,9 @@ else
   LIBDIRSUFFIX=""
 fi
 
-# Native build override:
-if [ -n "$SLKBUILD_NATIVE" ]; then
-  SLKCFLAGS="-O2 -march=native $SLKBUILD_CFLAGS"
+# Machine flags override (keep -O and -fPIC):
+if [ -n "$MCFLAGS" ]; then
+  SLKCFLAGS="$(echo $SLKCFLAGS | xargs -n1 | egrep -w '(-O[0-9a-z]*|-fPIC)' | xargs) $MCFLAGS"
 fi
 
 PKG=$TMP/package-$APP
