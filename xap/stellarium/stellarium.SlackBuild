@@ -60,10 +60,10 @@ find . -perm 666 -exec chmod 644 {} \;
 
 mkdir build && cd build || exit 1
 
-cmake -DCMAKE_BUILD_TYPE=Release \
+cmake -DCMAKE_C_FLAGS="$SLKCFLAGS" \
+      -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
+      -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=/usr \
-      -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-      -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
       .. || exit 1
 
 $MAKE || exit 1

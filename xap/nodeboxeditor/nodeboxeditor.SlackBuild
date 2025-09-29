@@ -30,7 +30,8 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-cmake . \
+cmake . -DCMAKE_C_FLAGS="$SLKCFLAGS" \
+      -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_INSTALL_PREFIX=/usr || exit 1
 # Fix desktop file path

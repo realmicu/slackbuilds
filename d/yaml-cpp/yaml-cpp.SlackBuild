@@ -55,9 +55,8 @@ find . \
 
 mkdir -p build || exit 1
 cd build || exit 1
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
+  cmake -DCMAKE_C_FLAGS="$SLKCFLAGS" \
+    -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
     -DCMAKE_INSTALL_PREFIX=/usr \
     -DLIB_SUFFIX=${LIBDIRSUFFIX} \
     -DYAML_BUILD_SHARED_LIBS=ON \

@@ -58,8 +58,8 @@ find . -perm 444 -exec chmod 644 {} \;
 find . -perm 777 -exec chmod 755 {} \;
 find . -perm 666 -exec chmod 644 {} \;
 
-CFLAGS="$SLKCFLAGS" \
-cmake . -DCMAKE_INSTALL_PREFIX="/usr" \
+cmake . -DCMAKE_C_FLAGS="$SLKCFLAGS" \
+	-DCMAKE_INSTALL_PREFIX="/usr" \
         -DCMAKE_INSTALL_SYSCONFDIR="/etc" \
         -DCMAKE_INSTALL_MANDIR="/usr/man" || exit 1
 $MAKE || exit 1
