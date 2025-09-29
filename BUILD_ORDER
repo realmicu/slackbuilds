@@ -70,17 +70,17 @@
 	i3	i3status			# i3wm
 	i3	i3blocks			# i3wm
 	ap	vifm
-	l	libslirp			# podman
-	ap	slirp4netns			# podman
-	ap	conmon				# podman
 	ap	go-md2man			# podman
-	ap	crun				# podman
-	n	cni-plugins			# podman
-	ap	fuse-overlayfs			# podman
-	ap	podman
-	ap	podman-catatonit
-	ap	buildah
-	ap	skopeo
+	l	libslirp			# podman
+	cntr	slirp4netns			# podman
+	cntr	conmon				# podman
+	cntr	crun				# podman
+	cntr	cni-plugins			# podman
+	cntr	fuse-overlayfs			# podman
+	cntr	podman
+	cntr	podman-catatonit
+	cntr	buildah
+	cntr	skopeo
 	l	cjson				# mosquitto
 	n	mosquitto
 	ap	nmon

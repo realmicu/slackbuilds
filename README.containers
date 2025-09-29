@@ -2,35 +2,39 @@
 Container packages (in build order):
 
   l/yajl
-  l/libslirp
-  ap/slirp4netns
-  ap/conmon
   ap/go-md2man
-  ap/crun
-  n/cni-plugins
-  ap/fuse-overlayfs
-  ap/podman
-  ap/podman-catatonit
-  ap/buildah
-  ap/skopeo
+  l/libslirp
+  cntr/slirp4netns
+  cntr/conmon
+  cntr/crun
+  cntr/cni-plugins
+  cntr/fuse-overlayfs
+  cntr/podman
+  cntr/podman-catatonit
+  cntr/buildah
+  cntr/skopeo
 
 System-wide configuration is stored in /etc/containers/ directory.
 
 Build notes:
 
+Container utilities use dedicated package series - 'cntr'.
+
 Tools are configured to use crun binary, not default runc.
 
 Buildah binary version matches that of podman internal buildah module.
 
+Recommended build tool: google-go-lang
+
 Usually gccgo in slackware (even current) is at version too old to build
 recent podman, buildah and skopeo. Because of this, build scripts for
 these 3 tools search/prepare 'go' framework in following order:
- * if 'go' is available at $GOROOT/bin/go (version from alien repo is
-   confirmed to work), use it
+ * if 'go' is available at $GOROOT/bin/go (version from alien repo or
+   Slackware current is confirmed to work), use it
  * otherwise try to reuse already built temporary version in /tmp/go-devel
  * else fetch and compile development branch of 'go' and deploy it into
    /tmp/go-devel
-Recommended approach is to install 'google-go-lang' from alienbob repo.
-Alternatively, let script prepare temporary environment in /tmp/go-devel
-and keep it there until last of container tools is built. Then it can be
-safely deleted.
+Recommended approach is to install 'google-go-lang' from alienbob repo
+(Slackware 15.0) or Slackware-current. Alternatively, let script prepare
+temporary environment in /tmp/go-devel and keep it there until last of
+container tools is built. Then it can be safely deleted.
