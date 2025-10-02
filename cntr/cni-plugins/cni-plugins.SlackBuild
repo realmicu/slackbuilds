@@ -7,7 +7,6 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
 TMP=${TMP:-/tmp}
 OUTDIR=${OUTDIR:-$TMP}
-NUMJOBS=${NUMJOBS:-"-j$(expr $(nproc) + 1)"}
 
 # The domain part of the go package name, usually the hosting platform
 DOMAIN=github.com

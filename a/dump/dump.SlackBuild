@@ -61,7 +61,7 @@ CFLAGS="$SLKCFLAGS" \
             --sysconfdir=/etc \
             --localstatedir=/var \
             --mandir=/usr/man \
-            --libdir=/lib \
+            --libdir=/lib$LIBDIRSUFFIX \
             --disable-rmt \
 	    --disable-sqlite \
 	    --disable-readline \

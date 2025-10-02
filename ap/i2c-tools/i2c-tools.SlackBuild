@@ -7,7 +7,7 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
 TMP=${TMP:-/tmp}
 OUTDIR=${OUTDIR:-$TMP}
-NUMJOBS=${NUMJOBS:-"-j$(expr $(nproc) + 1)"}
+NUMJOBS=${NUMJOBS:-1}
 
 # Automatically determine the architecture we're building on:
 if [ -z "$ARCH" ]; then
@@ -56,7 +56,7 @@ find . \
 sed -i -e 's,\(^mandir[[:blank:]]*=.*\)/share/man,\1/man,' \
        -e 's,\(^libdir[[:blank:]]*=.*\)/lib,\1/lib'$LIBDIRSUFFIX',' Makefile
 
-make PREFIX=/usr CFLAGS="$SLKCFLAGS" EXTRA=eeprog || exit 1
+make $NUMJOBS PREFIX=/usr CFLAGS="$SLKCFLAGS" EXTRA=eeprog || exit 1
 make install PREFIX=/usr DESTDIR=$PKG EXTRA=eeprog || exit 1
 
 # Don't ship .la files:

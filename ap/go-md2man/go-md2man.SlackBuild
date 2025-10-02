@@ -7,7 +7,6 @@ BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
 TMP=${TMP:-/tmp}
 OUTDIR=${OUTDIR:-$TMP}
-NUMJOBS=${NUMJOBS:-"-j$(expr $(nproc) + 1)"}
 
 # The domain part of the go package name, usually the hosting platform
 DOMAIN=github.com
@@ -23,25 +22,6 @@ if [ -z "$ARCH" ]; then
     *) ARCH=$(uname -m) ;;
   esac
   export ARCH
-fi
-
-if [ "$ARCH" = "i586" ]; then
-  SLKCFLAGS="-O2 -march=i586 -mtune=i686"
-  LIBDIRSUFFIX=""
-elif [ "$ARCH" = "i686" ]; then
-  SLKCFLAGS="-O2 -march=pentium4 -mtune=generic"
-  LIBDIRSUFFIX=""
-elif [ "$ARCH" = "x86_64" ]; then
-  SLKCFLAGS="-O2 -march=x86-64 -mtune=generic -fPIC"
-  LIBDIRSUFFIX="64"
-else
-  SLKCFLAGS="-O2"
-  LIBDIRSUFFIX=""
-fi
-
-# Machine flags override (keep -O and -fPIC):
-if [ -n "$MCFLAGS" ]; then
-  SLKCFLAGS="$(echo $SLKCFLAGS | xargs -n1 | egrep -w '(-O[0-9a-z]*|-fPIC)' | xargs) $MCFLAGS"
 fi
 
 PKG=$TMP/package-$APP
@@ -66,9 +46,6 @@ export GOPATH="$TMP/$APP-$VERSION"
 export GOBIN="$PKG/usr/bin"
 
 go install -a -x ./... || exit 1
-
-# Don't ship .la files:
-rm -f $PKG/{,usr/}lib${LIBDIRSUFFIX}/*.la
 
 chown -R root:bin $PKG/usr/bin $PKG/usr/sbin
 
