@@ -13,6 +13,7 @@ Container packages (in build order):
   cntr/podman-catatonit
   cntr/buildah
   cntr/skopeo
+  cntr/containerd
 
 System-wide configuration is stored in /etc/containers/ directory.
 

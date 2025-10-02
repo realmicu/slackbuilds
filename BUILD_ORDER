@@ -81,6 +81,7 @@
 	cntr	podman-catatonit
 	cntr	buildah
 	cntr	skopeo
+	cntr	containerd
 	l	cjson				# mosquitto
 	n	mosquitto
 	ap	nmon
