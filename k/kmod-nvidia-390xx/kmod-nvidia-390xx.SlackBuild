@@ -1,7 +1,7 @@
 #!/bin/sh
 cd $(dirname $0) ; CWD=$(pwd)
 
-APP=kmod-nvidia
+APP=kmod-nvidia-390xx
 KERNSRC=${KERNSRC:-/usr/src/linux}
 BINDIST=NVIDIA-Linux-x86_64
 MODLIST="nvidia-drm.ko nvidia-modeset.ko nvidia.ko"

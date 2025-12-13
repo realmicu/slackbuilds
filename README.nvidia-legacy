@@ -1,9 +1,10 @@
 
-Nvidia legacy binary driver is included in this tree.
-It is split into two packages (listed in build order):
+Nvidia legacy binary driver (390.xx series) is included
+in this tree.  It is split into two packages (listed
+in build order):
 
-  x/nvidia-driver
-  k/kmod-nvidia
+  x/nvidia-driver-390xx
+  k/kmod-nvidia-390xx
 
 First package contains libraries, binaries, config files
 and X.org support - basically everything besides kernel
