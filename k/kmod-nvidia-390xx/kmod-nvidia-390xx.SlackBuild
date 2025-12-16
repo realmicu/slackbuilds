@@ -45,7 +45,7 @@ find . \
   -exec chmod 644 {} \+
 
 # Apply patches if present:
-KPATCHDIR=$CWD/patches/$VERSION
+KPATCHDIR=$CWD/patches
 if [ -d $KPATCHDIR ] ; then
   ls $KPATCHDIR/*.patch 2>/dev/null | while read p ; do
     patch -p1 < $p || exit 1
