@@ -1,0 +1,12 @@
+diff --git a/kernel/Kbuild b/kernel/Kbuild
+index 89806d2..dbe7a22 100644
+--- a/kernel/Kbuild
++++ b/kernel/Kbuild
+@@ -78,6 +78,7 @@ $(foreach _module, $(NV_KERNEL_MODULES), \
+ ccflags-y += -I$(src)/common/inc
+ ccflags-y += -I$(src)
+ ccflags-y += -Wall $(DEFINES) $(INCLUDES) -Wno-cast-qual -Wno-format-extra-args
++ccflags-y += -Wno-expansion-to-defined
+ ccflags-y += -D__KERNEL__ -DMODULE -DNVRM
+ ccflags-y += -DNV_VERSION_STRING=\"580.119.02\"
+ 

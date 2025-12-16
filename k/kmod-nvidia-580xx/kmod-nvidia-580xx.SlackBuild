@@ -1,0 +1,98 @@
+#!/bin/sh
+cd $(dirname $0) ; CWD=$(pwd)
+
+APP=kmod-nvidia-580xx
+KERNSRC=${KERNSRC:-/usr/src/linux}
+BINDIST=NVIDIA-Linux-x86_64
+MODLIST="nvidia-uvm.ko nvidia-peermem.ko nvidia-drm.ko nvidia-modeset.ko nvidia.ko"
+VERSION=${VERSION:-$(echo ${BINDIST}-*.run | rev | cut -f 2- -d . | cut -f 1 -d - | rev)}
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+TMP=${TMP:-/tmp}
+OUTDIR=${OUTDIR:-$TMP}
+NUMJOBS=${NUMJOBS:-"-j$(expr $(nproc) + 1)"}
+
+# Run this with kernel configured/compiled!
+if [ ! -f ${KERNSRC}/include/config/kernel.release ] ; then
+  echo "Run 'make *config' then 'make modules_prepare' in kernel source dir first."
+  exit 1
+else
+  KERNVER=$(cat ${KERNSRC}/include/config/kernel.release)
+fi
+
+# Take architecture from kernel (for x86 only):
+if fgrep -qw "CONFIG_X86_32=y" ${KERNSRC}/.config ; then
+  ARCH="i686"
+elif fgrep -qw "CONFIG_X86_64=y" ${KERNSRC}/.config ; then
+  ARCH="x86_64"
+else
+  echo "CPU architecture other than x86 not supported."
+  exit 2
+fi
+
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG
+cd $TMP
+rm -rf $BINDIST-$VERSION
+$CWD/${BINDIST}-${VERSION}.run -x || exit 1
+cd $BINDIST-$VERSION || exit 1
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \+ -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \+
+
+# Apply patches if present:
+KPATCHDIR=$CWD/patches
+if [ -d $KPATCHDIR ] ; then
+  ls $KPATCHDIR/*.patch 2>/dev/null | while read p ; do
+    patch -p1 < $p || exit 1
+  done
+fi
+
+cd kernel || exit 1
+
+make $NUMJOBS CC="gcc" SYSSRC="$KERNSRC" || exit 1
+
+# Install manually:
+DESTDIR=$PKG/lib/modules/${KERNVER}/kernel/drivers/video
+mkdir -p $DESTDIR $PKG/etc/modprobe.d || exit 1
+cp -v $MODLIST $DESTDIR || exit 1
+cp -v $CWD/modprobe_nvidia.conf $PKG/etc/modprobe.d/nvidia.conf.new || exit 1
+chmod 644 ${DESTDIR}/*.ko $PKG/etc/modprobe.d/*.conf.new && \
+chown root:root ${DESTDIR}/*.ko $PKG/etc/modprobe.d/*.conf.new
+
+mkdir -p $PKG/install
+[ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh > $PKG/install/doinst.sh
+[ -f $CWD/doinst.sh.gz ] && zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
+
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# Update doinst.sh (should be kept here due to $KERNVER):
+cat << EOF >> $PKG/install/doinst.sh
+
+# A good idea whenever kernel modules are added or changed:
+if [ -x sbin/depmod ]; then
+  chroot . /sbin/depmod -a $KERNVER 1> /dev/null 2> /dev/null
+fi
+
+EOF
+# ----------------
+
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
+
+cd $PKG
+makepkg -l y -c n $OUTDIR/$APP-${VERSION}_${KERNVER}-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/$BINDIST-$VERSION
+  rm -rf $PKG
+fi

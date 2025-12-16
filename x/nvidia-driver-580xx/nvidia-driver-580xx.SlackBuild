@@ -1,0 +1,279 @@
+#!/bin/sh
+cd $(dirname $0) ; CWD=$(pwd)
+
+APP=nvidia-driver-580xx
+BINDIST=NVIDIA-Linux
+VERSION=${VERSION:-$(echo ${BINDIST}-*-*.run | rev | cut -d. -f2- | cut -d- -f1 | rev)}
+ARCH=$(echo ${BINDIST}-*-*.run | rev | cut -d- -f2 | rev)
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+TMP=${TMP:-/tmp}
+OUTDIR=${OUTDIR:-$TMP}
+
+if [ "$ARCH" = "x86_64" ]; then
+  LIBDIRSUFFIX="64"
+else
+  LIBDIRSUFFIX=""
+fi
+
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG
+cd $TMP
+rm -rf $BINDIST-$VERSION
+$CWD/${BINDIST}-${ARCH}-${VERSION}.run -x || exit 1
+cd $BINDIST-$ARCH-$VERSION || exit 1
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \+ -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \+
+
+# Installation is performed manually, nvidia-installer is not launched
+# (source of truth is .manifest file in driver's root dir):
+mkdir -vp \
+  $PKG/usr/bin \
+  $PKG/usr/doc/$APP-$VERSION/samples \
+  $PKG/usr/lib${LIBDIRSUFFIX}/{nvidia,vdpau} \
+  $PKG/usr/lib${LIBDIRSUFFIX}/xorg/modules/{drivers,extensions} \
+  $PKG/usr/man/man1 \
+  $PKG/etc/ld.so.conf.d \
+  $PKG/etc/OpenCL/vendors \
+  $PKG/etc/X11/xorg.conf.d \
+  $PKG/etc/vulkan/{icd.d,implicit_layer.d} \
+  $PKG/etc/vulkansc/icd.d \
+  $PKG/usr/share/X11/xorg.conf.d \
+  $PKG/usr/share/applications \
+  $PKG/usr/share/dbus-1/system.d \
+  $PKG/usr/share/egl/egl_external_platform.d \
+  $PKG/usr/share/glvnd/egl_vendor.d \
+  $PKG/usr/share/nvidia/files.d \
+  $PKG/usr/share/pixmaps \
+  $PKG/lib/firmware/nvidia/$VERSION
+
+# Versioned libraries:
+cp -av \
+  libEGL.so.$VERSION \
+  libEGL_nvidia.so.$VERSION \
+  libGLESv1_CM_nvidia.so.$VERSION \
+  libGLESv2_nvidia.so.$VERSION \
+  libGLX_nvidia.so.$VERSION \
+  libcuda.so.$VERSION \
+  libcudadebugger.so.$VERSION \
+  libnvcuvid.so.$VERSION \
+  libnvidia-allocator.so.$VERSION \
+  libnvidia-cfg.so.$VERSION \
+  libnvidia-eglcore.so.$VERSION \
+  libnvidia-encode.so.$VERSION \
+  libnvidia-fbc.so.$VERSION \
+  libnvidia-glcore.so.$VERSION \
+  libnvidia-glsi.so.$VERSION \
+  libnvidia-glvkspirv.so.$VERSION \
+  libnvidia-gpucomp.so.$VERSION \
+  libnvidia-gtk2.so.$VERSION \
+  libnvidia-gtk3.so.$VERSION \
+  libnvidia-ml.so.$VERSION \
+  libnvidia-ngx.so.$VERSION \
+  libnvidia-nvvm.so.$VERSION \
+  libnvidia-opencl.so.$VERSION \
+  libnvidia-opticalflow.so.$VERSION \
+  libnvidia-pkcs11-openssl3.so.$VERSION \
+  libnvidia-pkcs11.so.$VERSION \
+  libnvidia-present.so.$VERSION \
+  libnvidia-ptxjitcompiler.so.$VERSION \
+  libnvidia-rtcore.so.$VERSION \
+  libnvidia-sandboxutils.so.$VERSION \
+  libnvidia-tls.so.$VERSION \
+  libnvidia-vksc-core.so.$VERSION \
+  libnvidia-wayland-client.so.$VERSION \
+  libnvoptix.so.$VERSION \
+  $PKG/usr/lib$LIBDIRSUFFIX
+( cd $PKG/usr/lib$LIBDIRSUFFIX
+  ln -s libEGL_nvidia.so.$VERSION libEGL_nvidia.so.0
+  ln -s libGLESv1_CM_nvidia.so.$VERSION libGLESv1_CM_nvidia.so.1
+  ln -s libGLESv2_nvidia.so.$VERSION libGLESv2_nvidia.so.2
+  ln -s libGLX_nvidia.so.$VERSION libGLX_nvidia.so.0
+  ln -s libGLX_nvidia.so.$VERSION libGLX_indirect.so.0
+  ln -s libcuda.so.$VERSION libcuda.so.1
+  ln -s libcuda.so.1 libcuda.so
+  ln -s libcudadebugger.so.$VERSION libcudadebugger.so.1
+  ln -s libnvcuvid.so.$VERSION libnvcuvid.so.1
+  ln -s libnvcuvid.so.1 libnvcuvid.so
+  ln -s libnvidia-allocator.so.$VERSION libnvidia-allocator.so.1
+  ln -s libnvidia-allocator.so.1 libnvidia-allocator.so
+  ln -s libnvidia-allocator.so.1 nvidia-drm_gbm.so
+  ln -s libnvidia-cfg.so.$VERSION libnvidia-cfg.so.1
+  ln -s libnvidia-cfg.so.1 libnvidia-cfg.so
+  ln -s libnvidia-encode.so.$VERSION libnvidia-encode.so.1
+  ln -s libnvidia-encode.so.1 libnvidia-encode.so
+  ln -s libnvidia-fbc.so.$VERSION libnvidia-fbc.so.1
+  ln -s libnvidia-fbc.so.1 libnvidia-fbc.so
+  ln -s libnvidia-ml.so.$VERSION libnvidia-ml.so.1
+  ln -s libnvidia-ml.so.1 libnvidia-ml.so
+  ln -s libnvidia-nvvm.so.$VERSION libnvidia-nvvm.so.4
+  ln -s libnvidia-nvvm.so.4 libnvidia-nvvm.so
+  ln -s libnvidia-opencl.so.$VERSION libnvidia-opencl.so.1
+  ln -s libnvidia-opticalflow.so.$VERSION libnvidia-opticalflow.so.1
+  ln -s libnvidia-opticalflow.so.1 libnvidia-opticalflow.so
+  ln -s libnvidia-ptxjitcompiler.so.$VERSION libnvidia-ptxjitcompiler.so.1
+  ln -s libnvidia-ptxjitcompiler.so.1 libnvidia-ptxjitcompiler.so
+  ln -s libnvidia-sandboxutils.so.$VERSION libnvidia-sandboxutils.so.1
+  ln -s libnvidia-sandboxutils.so.1 libnvidia-sandboxutils.so
+  ln -s libnvidia-vksc-core.so.$VERSION libnvidia-vksc-core.so.1
+  ln -s libnvoptix.so.$VERSION libnvoptix.so.1
+)
+
+# Version-independent libraries:
+cp -av \
+  libnvidia-api.so.1 \
+  libnvidia-egl-gbm.so.1.1.2 \
+  libnvidia-egl-wayland.so.1.1.20 \
+  libnvidia-egl-xcb.so.1.0.4 \
+  libnvidia-egl-xlib.so.1.0.4 \
+  libnvidia-nvvm70.so.4 \
+  $PKG/usr/lib$LIBDIRSUFFIX
+
+# Conflicting libraries:
+# (lib*GL*.so: libglvnd, libOpenCL.so: ocl-icd)
+# (override in /etc/ld.so.conf.d/nvidia.conf)
+cp -av \
+  libEGL.so.1.1.0 \
+  libGL.so.1.7.0 \
+  libGLX.so.0 \
+  libOpenGL.so.0 \
+  libGLESv1_CM.so.1.2.0 \
+  libGLESv2.so.2.1.0 \
+  libGLdispatch.so.0 \
+  libOpenCL.so.1.0.0 \
+  $PKG/usr/lib$LIBDIRSUFFIX/nvidia
+( cd $PKG/usr/lib$LIBDIRSUFFIX/nvidia
+  ln -s libEGL.so.1.1.0 libEGL.so.1
+  ln -s libEGL.so.1 libEGL.so
+  ln -s libGL.so.1.7.0 libGL.so.1
+  ln -s libGL.so.1 libGL.so
+  ln -s libGLX.so.0 libGLX.so
+  ln -s libOpenGL.so.0 libOpenGL.so
+  ln -s libGLESv1_CM.so.1.2.0 libGLESv1_CM.so.1
+  ln -s libGLESv1_CM.so.1 libGLESv1_CM.so
+  ln -s libGLESv2.so.2.1.0 libGLESv2.so.2
+  ln -s libGLESv2.so.2 libGLESv2.so
+  ln -s libOpenCL.so.1.0.0 libOpenCL.so.1.0
+  ln -s libOpenCL.so.1.0 libOpenCL.so.1
+  ln -s libOpenCL.so.1 libOpenCL.so
+)
+
+# Xorg drivers:
+cp -av nvidia_drv.so $PKG/usr/lib${LIBDIRSUFFIX}/xorg/modules/drivers
+cp -av libglxserver_nvidia.so.$VERSION $PKG/usr/lib${LIBDIRSUFFIX}/xorg/modules/extensions
+( cd $PKG/usr/lib${LIBDIRSUFFIX}/xorg/modules/extensions
+  ln -s libglxserver_nvidia.so.$VERSION libglxserver_nvidia.so
+)
+
+# VDPAU:
+cp -av libvdpau_nvidia.so.$VERSION $PKG/usr/lib${LIBDIRSUFFIX}/vdpau
+( cd $PKG/usr/lib${LIBDIRSUFFIX}/vdpau
+  ln -s libvdpau_nvidia.so.$VERSION libvdpau_nvidia.so.1
+  ln -s libvdpau_nvidia.so.1 libvdpau_nvidia.so
+)
+( cd $PKG/usr/lib$LIBDIRSUFFIX
+  ln -s vdpau/libvdpau_nvidia.so libvdpau_nvidia.so
+)
+
+# Utilities:
+cp -av \
+  nvidia-bug-report.sh \
+  nvidia-cuda-mps-control \
+  nvidia-cuda-mps-server \
+  nvidia-debugdump \
+  nvidia-installer \
+  nvidia-modprobe \
+  nvidia-ngx-updater \
+  nvidia-pcc \
+  nvidia-persistenced \
+  nvidia-powerd \
+  nvidia-settings \
+  nvidia-smi \
+  nvidia-xconfig \
+  $PKG/usr/bin
+( cd $PKG/usr/bin
+  ln -s nvidia-installer nvidia-uninstall
+)
+chown root:root $PKG/usr/bin/nvidia-modprobe && chmod 4711 $PKG/usr/bin/nvidia-modprobe
+
+# Man pages:
+cp -av \
+  nvidia-cuda-mps-control.1.gz \
+  nvidia-installer.1.gz \
+  nvidia-modprobe.1.gz \
+  nvidia-persistenced.1.gz \
+  nvidia-settings.1.gz \
+  nvidia-smi.1.gz \
+  nvidia-xconfig.1.gz \
+  $PKG/usr/man/man1
+
+# Configuration files:
+cp -av 10_nvidia.json $PKG/usr/share/glvnd/egl_vendor.d
+LIB_EGL_WAYLAND_SO_VERSION="$(echo libnvidia-egl-wayland.so.* | sed -e 's/.*\.so\.//' -e 's/\./\\./g')"
+sed -e 's/"\(library_path\)" : "\(libnvidia-egl-wayland.so\).1"/"\1" : "\2\.'${LIB_EGL_WAYLAND_SO_VERSION}'"/' \
+  10_nvidia_wayland.json > $PKG/usr/share/egl/egl_external_platform.d/11_nvidia_wayland.json
+cp -av \
+  15_nvidia_gbm.json \
+  20_nvidia_xcb.json \
+  20_nvidia_xlib.json \
+  $PKG/usr/share/egl/egl_external_platform.d
+cp -av nvidia-dbus.conf $PKG/usr/share/dbus-1/system.d
+cp -av nvidia-drm-outputclass.conf \
+  $PKG/usr/share/X11/xorg.conf.d/20-nvidia-drm-outputclass.conf
+sed -e 's:__UTILS_PATH__:/usr/bin:' \
+  nvidia-settings.desktop > $PKG/usr/share/applications/nvidia-settings.desktop
+cp -av nvidia-settings.png $PKG/usr/share/pixmaps
+cp -av nvidia.icd $PKG/etc/OpenCL/vendors
+cp -av nvidia_icd.json $PKG/etc/vulkan/icd.d
+cp -av nvidia_layers.json $PKG/etc/vulkan/implicit_layer.d
+cp -av nvidia_icd_vksc.json $PKG/etc/vulkansc/icd.d
+cp -av nvoptix.bin $PKG/usr/share/nvidia
+cp -av \
+  nvidia-application-profiles-${VERSION}-key-documentation \
+  nvidia-application-profiles-${VERSION}-rc \
+  $PKG/usr/share/nvidia
+cp -av sandboxutils-filelist.json $PKG/usr/share/nvidia/files.d
+
+# Additional custom config:
+cp -av $CWD/xorg_nvidia.conf $PKG/etc/X11/xorg.conf.d/10-nvidia.conf
+cp -av $CWD/ld_so_nvidia.conf $PKG/etc/ld.so.conf.d/nvidia.conf
+echo "#/usr/lib$LIBDIRSUFFIX/nvidia" >> $PKG/etc/ld.so.conf.d/nvidia.conf
+
+# Firmware:
+cp -av firmware/*.bin $PKG/lib/firmware/nvidia/$VERSION
+
+# Documentation:
+cp -av LICENSE NVIDIA_Changelog README.txt html $PKG/usr/doc/$APP-$VERSION
+cp -av nvidia-persistenced-init.tar.bz2 $PKG/usr/doc/$APP-$VERSION/samples
+
+chown -R root:bin $PKG/usr/bin
+
+mkdir -p $PKG/install
+echo "VERSION=\"$VERSION\"" > $PKG/install/doinst.sh
+echo "LIBDIRSUFFIX=\"$LIBDIRSUFFIX\"" >> $PKG/install/doinst.sh
+echo "LIBDIRSUFFIX=\"$LIBDIRSUFFIX\"" > $PKG/install/douninst.sh
+[ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh >> $PKG/install/doinst.sh
+[ -f $CWD/douninst.sh ] && cat $CWD/douninst.sh >> $PKG/install/douninst.sh
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
+
+cd $PKG
+makepkg -l y -c n $OUTDIR/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/$BINDIST-$VERSION
+  rm -rf $PKG
+fi
+
