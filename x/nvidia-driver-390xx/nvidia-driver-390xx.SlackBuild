@@ -21,8 +21,8 @@ rm -rf $PKG
 mkdir -p $PKG
 cd $TMP
 rm -rf $BINDIST-$VERSION
-$CWD/${BINDIST}-${VERSION}.run -x || exit 1
-cd $BINDIST-$VERSION || exit 1
+$CWD/${BINDIST}-${ARCH}-${VERSION}.run -x || exit 1
+cd $BINDIST-$ARCH-$VERSION || exit 1
 chown -R root:root .
 find . \
   \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
