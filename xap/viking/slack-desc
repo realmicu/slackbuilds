@@ -16,4 +16,4 @@ viking: Upload and Download tracks from OSM, Routing from OSRM or Google,
 viking: Name Searches from OSM Nominatim or Google and more.
 viking: It is written in mainly in C with some C++ and uses the GTK+2 toolkit.
 viking:
-viking: URL: http://sourceforge.net/projects/viking/
+viking: URL: https://sourceforge.net/projects/viking/

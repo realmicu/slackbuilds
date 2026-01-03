@@ -1,0 +1,560 @@
+diff --git a/data/datasources.xml b/data/datasources.xml
+index 7b9c3af..eebb7ce 100644
+--- a/data/datasources.xml
++++ b/data/datasources.xml
+@@ -3,6 +3,6 @@
+     <property name="label">OpenStreetMap Amenity POIs</property>
+     <property name="url_format_code">BLTRS</property>
+     <property name="file_type">osm</property>
+-    <property name="url">http://overpass-api.de/api/interpreter?data=[bbox:%s,%s,%s,%s];node[amenity="%s"];out%%20center;</property>
++    <property name="url">https://overpass-api.de/api/interpreter?data=[bbox:%s,%s,%s,%s];node[amenity="%s"];out%%20center;</property>
+   </object>
+ </objects>
+diff --git a/data/goto_tools.xml b/data/goto_tools.xml
+index e6d3bb6..f4e9cc6 100644
+--- a/data/goto_tools.xml
++++ b/data/goto_tools.xml
+@@ -1,41 +1,32 @@
+ <objects>
+   <!-- Latitude and longitude are XML elements -->
+-<!-- Built in
++  <!-- Built in  - geonames.c
+   <object class="VikGotoXmlTool">
+     <property name="label">Geonames</property>
+-    <property name="url-format">http://ws.geonames.org/search?q=%s&amp;maxRows=1&amp;lang=es&amp;style=short</property>
++    <property name="url-format">http://api.geonames.org/search?q=%s&amp;lang=en&amp;style=short</property>
+     <property name="lat-path">/geonames/geoname/lat</property>
+     <property name="lon-path">/geonames/geoname/lng</property>
+   </object>
+--->
++  -->
+   <!-- Latitude and longitude are XML attributes -->
+-<!-- Built in
++  <!-- Service no longer active -->
++  <!--
+   <object class="VikGotoXmlTool">
+-    <property name="label">Name finder</property>
++    <property name="label">OSM Gazetteer</property>
+     <property name="url-format">http://gazetteer.openstreetmap.org/namefinder/search.xml?find=%s&amp;max=1</property>
+     <property name="lat-path">/searchresults/named</property>
+     <property name="lat-attr">lat</property>
+     <property name="lon-path">/searchresults/named</property>
+     <property name="lon-attr">lon</property>
+   </object>
+--->
++  -->
+   <!-- Latitude and longitude are XML attributes (XPATH format) -->
+-<!-- Built in
+-<object class="VikGotoXmlTool">
++  <!-- Built in - osm.c
++  <object class="VikGotoXmlTool">
+     <property name="label">Nominatim</property>
+-    <property name="url-format">http://nominatim.openstreetmap.org/search?q=%s&amp;format=xml</property>
++    <property name="url-format">https://nominatim.openstreetmap.org/search?q=%s&amp;format=xml</property>
+     <property name="lat-path">/searchresults/place@lat</property>
+     <property name="lon-path">/searchresults/place@lon</property>
+   </object>
+--->
+-<!-- Built in
+-  <object class="VikGotoXmlTool">
+-    <property name="label">Mapquest Nominatim</property>
+-    <property name="url-format">http://open.mapquestapi.com/nominatim/v1/search?format=xml&amp;limit=1&amp;q=%s</property>
+-    <property name="lat-path">/searchresults/place</property>
+-    <property name="lat-attr">lat</property>
+-    <property name="lon-path">/searchresults/place</property>
+-    <property name="lon-attr">lon</property>
+-  </object>
+--->
++  -->
+ </objects>
+diff --git a/data/maps.xml b/data/maps.xml
+index 3c48e14..b89835a 100644
+--- a/data/maps.xml
++++ b/data/maps.xml
+@@ -1,32 +1,30 @@
+ <objects>
+-<!-- Built in
++<!-- Built in - osm.c
+   <object class="VikSlippyMapSource">
+     <property name="name">OSM-Mapnik</property>
+     <property name="label">OpenStreetMap (Mapnik)</property>
+-    <property name="hostname">tile.openstreetmap.org</property>
+-    <property name="url">/%d/%d/%d.png</property>
++    <property name="url">https://tile.openstreetmap.org/%d/%d/%d.png</property>
+     <property name="id">13</property>
+     <property name="zoom-min">0</property>
+     <property name="zoom-max">19</property>
+     <property name="copyright">© OpenStreetMap contributors</property>
+     <property name="license">CC-BY-SA</property>
+-    <property name="license-url">http://www.openstreetmap.org/copyright</property>
++    <property name="license-url">https://www.openstreetmap.org/copyright</property>
+     <property name="use-etag">TRUE</property>
+     <property name="follow-location">2</property>
+   </object>
+ -->
+-<!-- Built in
++<!-- Built in - osm.c
+   <object class="VikSlippyMapSource">
+     <property name="name">OSM-Cycle</property>
+     <property name="label">OpenStreetMap (Cycle)</property>
+-    <property name="hostname">b.tile.opencyclemap.org</property>
+-    <property name="url">/cycle/%d/%d/%d.png</property>
++    <property name="url">https://tile.thunderforest.com/cycle/%d/%d/%d.png</property>
+     <property name="zoom-min">0</property>
+     <property name="zoom-max">18</property>
+     <property name="id">17</property>
+     <property name="copyright">© OpenStreetMap contributors</property>
+     <property name="license">CC-BY-SA</property>
+-    <property name="license-url">http://www.openstreetmap.org/copyright</property>
++    <property name="license-url">https://www.openstreetmap.org/copyright</property>
+     <property name="check-file-server-time">TRUE</property>
+     <property name="follow-location">2</property>
+   </object>
+@@ -42,7 +40,7 @@
+     <property name="name">OSM-GPS</property>
+     <property name="copyright">© OpenStreetMap contributors</property>
+     <property name="license">CC-BY-SA</property>
+-    <property name="license-url">http://www.openstreetmap.org/copyright</property>
++    <property name="license-url">https://www.openstreetmap.org/copyright</property>
+     <property name="use-etag">TRUE</property>
+   </object>
+   <object class="VikSlippyMapSource">
+@@ -55,14 +53,14 @@
+     <property name="name">CyclOSM</property>
+     <property name="copyright">© OpenStreetMap contributors</property>
+     <property name="license">CC-BY-SA</property>
+-    <property name="license-url">http://www.openstreetmap.org/copyright</property>
++    <property name="license-url">https://www.openstreetmap.org/copyright</property>
+     <property name="check-file-server-time">TRUE</property>
+   </object>
+   <object class="VikSlippyMapSource">
+     <property name="id">29</property>
+     <property name="name">CalTopo</property>
+     <property name="label">CalTopo USGS 7.5" Topos</property>
+-    <property name="hostname">s3-us-west-1.amazonaws.com</property>
++    <property name="hostname">https://s3-us-west-1.amazonaws.com</property>
+     <property name="url">/caltopo/topo/%d/%d/%d.png?v=1</property>
+     <property name="follow-location">2</property>
+     <property name="zoom-min">0</property>
+@@ -73,11 +71,11 @@
+     <property name="lon-max">-66.95</property>
+     <property name="copyright">CalTopo Terms of Use</property>
+     <property name="license">CalTopo Terms of Use</property>
+-    <property name="license-url">http://caltopo.com/</property>
++    <property name="license-url">https://caltopo.com/</property>
+   </object>
+   <object class="VikSlippyMapSource">
+     <property name="label">Public Transport Map</property>
+-    <property name="hostname">tile.xn--pnvkarte-m4a.de</property>
++    <property name="hostname">https://tile.xn--pnvkarte-m4a.de</property>
+     <property name="url">/tilegen/%0d/%d/%d.png</property>
+     <property name="follow-location">2</property>
+     <property name="zoom-min">0</property>
+@@ -86,12 +84,12 @@
+     <property name="name">pnvkarte</property>
+     <property name="copyright">© OpenStreetMap contributors</property>
+     <property name="license">CC-BY-SA</property>
+-    <property name="license-url">http://www.openstreetmap.org/copyright</property>
++    <property name="license-url">https://www.openstreetmap.org/copyright</property>
+   </object>
+   <object class="VikSlippyMapSource">
+     <property name="name">OpenSeaMap</property>
+     <property name="label">OpenSeaMap</property>
+-    <property name="hostname">tiles.openseamap.org</property>
++    <property name="hostname">https://tiles.openseamap.org</property>
+     <property name="url">/seamark/%d/%d/%d.png</property>
+     <property name="zoom-min">8</property>
+     <property name="zoom-max">18</property>
+@@ -99,82 +97,82 @@
+     <property name="follow-location">2</property>
+     <property name="copyright">© OpenStreetMap contributors</property>
+     <property name="license">CC-BY-SA</property>
+-    <property name="license-url">http://www.openstreetmap.org/copyright</property>
++    <property name="license-url">https://www.openstreetmap.org/copyright</property>
+   </object>
+   <object class="VikSlippyMapSource">
+     <property name="name">Waymarked Trails Hiking</property>
+     <property name="label">Waymarked Trails Hiking</property>
+-    <property name="hostname">tile.waymarkedtrails.org</property>
++    <property name="hostname">https://tile.waymarkedtrails.org</property>
+     <property name="url">/hiking/%d/%d/%d.png</property>
+     <property name="id">701</property>
+     <property name="follow-location">2</property>
+     <property name="license">CC-by-SA 3.0 / ODBl</property>
+-    <property name="license-url">http://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
++    <property name="license-url">https://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
+   </object>
+   <object class="VikSlippyMapSource">
+     <property name="name">Waymarked Trails Cycling</property>
+     <property name="label">Waymarked Trails Cycling</property>
+-    <property name="hostname">tile.waymarkedtrails.org</property>
++    <property name="hostname">https://tile.waymarkedtrails.org</property>
+     <property name="url">/cycling/%d/%d/%d.png</property>
+     <property name="follow-location">2</property>
+     <property name="id">702</property>
+     <property name="license">CC-by-SA 3.0 / ODBl</property>
+-    <property name="license-url">http://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
++    <property name="license-url">https://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
+   </object>
+   <object class="VikSlippyMapSource">
+     <property name="name">Waymarked Trails MTB</property>
+     <property name="label">Waymarked Trails MTB</property>
+-    <property name="hostname">tile.waymarkedtrails.org</property>
++    <property name="hostname">https://tile.waymarkedtrails.org</property>
+     <property name="url">/mtb/%d/%d/%d.png</property>
+     <property name="follow-location">2</property>
+     <property name="id">703</property>
+     <property name="license">CC-by-SA 3.0 / ODBl</property>
+-    <property name="license-url">http://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
++    <property name="license-url">https://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
+   </object>
+   <object class="VikSlippyMapSource">
+     <property name="name">Waymarked Trails Inline Skating</property>
+     <property name="label">Waymarked Trails Inline Skating</property>
+-    <property name="hostname">tile.waymarkedtrails.org</property>
++    <property name="hostname">https://tile.waymarkedtrails.org</property>
+     <property name="url">/skating/%d/%d/%d.png</property>
+     <property name="follow-location">2</property>
+     <property name="id">704</property>
+     <property name="license">CC-by-SA 3.0 / ODBl</property>
+-    <property name="license-url">http://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
++    <property name="license-url">https://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
+   </object>
+   <object class="VikSlippyMapSource">
+     <property name="name">Waymarked Trails Riding</property>
+     <property name="label">Waymarked Trails Riding</property>
+-    <property name="hostname">tile.waymarkedtrails.org</property>
++    <property name="hostname">https://tile.waymarkedtrails.org</property>
+     <property name="url">/riding/%d/%d/%d.png</property>
+     <property name="follow-location">2</property>
+     <property name="id">705</property>
+     <property name="license">CC-by-SA 3.0 / ODBl</property>
+-    <property name="license-url">http://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
++    <property name="license-url">https://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
+   </object>
+   <object class="VikSlippyMapSource">
+     <property name="label">Waymarked Trails Winter Sport Slopes</property>
+-    <property name="hostname">tile.waymarkedtrails.org</property>
++    <property name="hostname">https://tile.waymarkedtrails.org</property>
+     <property name="url">/slopes/%d/%d/%d.png</property>
+     <property name="follow-location">2</property>
+     <property name="id">706</property>
+     <property name="license">CC-by-SA 3.0 / ODBl</property>
+-    <property name="license-url">http://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
++    <property name="license-url">https://creativecommons.org/licenses/by-sa/3.0/de/deed.en</property>
+   </object>
+   <object class="VikSlippyMapSource">
+     <property name="name">4UMaps</property>
+     <property name="label">4UMaps</property>
+-    <property name="hostname">tileserver.4umaps.eu</property>
++    <property name="hostname">https://tileserver.4umaps.eu</property>
+     <property name="url">/%d/%d/%d.png</property>
+     <property name="copyright">© 4UMaps.eu © OpenStreetMap and contributors</property>
+     <property name="license">CC-BY-SA</property>
+-    <property name="license-url">http://www.4umaps.eu/terms-of-use-copyright.aspx</property>
++    <property name="license-url">https://www.4umaps.eu/terms-of-use-copyright.aspx</property>
+     <property name="id">801</property>
+   </object>
+-<!-- Built in
++<!-- Built in - osm.c
+   <object class="VikSlippyMapSource">
+     <property name="name">OpenTopoMap</property>
+     <property name="label">OpenTopoMap</property>
+-    <property name="hostname">a.tile.opentopomap.org</property>
++    <property name="hostname">https://a.tile.opentopomap.org</property>
+     <property name="url">/%d/%d/%d.png</property>
+     <property name="follow-location">2</property>
+     <property name="copyright">Kartendaten: © OpenStreetMap-Mitwirkende, SRTM | Kartendarstellung: © OpenTopoMap</property>
+diff --git a/data/routing.xml b/data/routing.xml
+index 03d55e2..0e1dc4e 100644
+--- a/data/routing.xml
++++ b/data/routing.xml
+@@ -3,7 +3,7 @@
+     <property name="id">brouter</property>
+     <property name="label">brouter</property>
+     <property name="format">gpx</property>
+-    <property name="url-base">http://h2096617.stratoserver.net:443/brouter?nogos=&amp;profile=hiking-beta&amp;alternativeidx=0&amp;format=gpx</property>
++    <property name="url-base">https://h2096617.stratoserver.net:443/brouter?nogos=&amp;profile=hiking-beta&amp;alternativeidx=0&amp;format=gpx</property>
+     <property name="url-start-ll">&amp;lonlats=%s,%s</property>
+     <property name="url-stop-ll">|%s,%s</property>
+     <property name="url-via-ll"></property>
+@@ -13,7 +13,7 @@
+     <property name="id">brouterCar</property>
+     <property name="label">brouter Car</property>
+     <property name="format">gpx</property>
+-    <property name="url-base">http://h2096617.stratoserver.net:443/brouter?nogos=&amp;profile=car-fast&amp;alternativeidx=0&amp;format=gpx</property>
++    <property name="url-base">https://h2096617.stratoserver.net:443/brouter?nogos=&amp;profile=car-fast&amp;alternativeidx=0&amp;format=gpx</property>
+     <property name="url-start-ll">&amp;lonlats=%s,%s</property>
+     <property name="url-stop-ll">|%s,%s</property>
+     <property name="url-via-ll"></property>
+@@ -53,7 +53,7 @@
+     <property name="id">yourscar</property>
+     <property name="label">Yours: Car</property>
+     <property name="format">kml</property>
+-    <property name="url-base">http://www.yournavigation.org/api/1.0/gosmore.php?format=kml</property>
++    <property name="url-base">https://www.yournavigation.org/api/1.0/gosmore.php?format=kml</property>
+     <property name="url-start-ll">&amp;flat=%s&amp;flon=%s</property>
+     <property name="url-stop-ll">&amp;tlat=%s&amp;tlon=%s&amp;v=car&amp;fast=1&amp;layer=mapnik</property>
+   </object>
+@@ -61,7 +61,7 @@
+     <property name="id">yoursbikefoot</property>
+     <property name="label">Yours: Bicycle/Foot</property>
+     <property name="format">kml</property>
+-    <property name="url-base">http://www.yournavigation.org/api/1.0/gosmore.php?format=kml</property>
++    <property name="url-base">https://www.yournavigation.org/api/1.0/gosmore.php?format=kml</property>
+     <property name="url-start-ll">&amp;flat=%s&amp;flon=%s</property>
+     <property name="url-stop-ll">&amp;tlat=%s&amp;tlon=%s&amp;v=bicycle&amp;fast=1&amp;layer=mapnik</property>
+   </object>
+diff --git a/doc/examples/external_tools.xml b/doc/examples/external_tools.xml
+index 0d05752..7d7ea66 100644
+--- a/doc/examples/external_tools.xml
++++ b/doc/examples/external_tools.xml
+@@ -3,7 +3,7 @@
+   <!-- The VikWebtoolCenter allows to declare any Webtool using a logic based on center coordinates and zoom level value. -->
+   <object class="VikWebtoolCenter">
+     <property name="label">NLS: Historic Map of GB</property>
+-    <property name="url">http://nls.tileserver.com?lat=%s&amp;lng=%s&amp;zoom=%d</property>
++    <property name="url">https://nls.tileserver.com?lat=%s&amp;lng=%s&amp;zoom=%d</property>
+   </object>
+   <!-- NB The JOSM link is built into the source code - see osm.c -->
+   <!-- The VikWebtoolBounds allows to declare any Webtool using a logic based on bounds coordinates. -->
+@@ -16,7 +16,7 @@
+        ATM You can't override built in ones.
+   <object class="VikWebtoolFormat">
+     <property name="label">Geofabrik Map Compare x6</property>
+-    <property name="url">http://tools.geofabrik.de/mc/#%s/%s/%s&num=6</property>
++    <property name="url">https://tools.geofabrik.de/mc/#%s/%s/%s&num=6</property>
+     <property name="url_format_code">AOZ</property>
+   </object>
+   -->
+@@ -27,5 +27,5 @@
+   <!-- R = Right of the current view i.e. maximum longitude -->
+   <!-- A = center lAtitude of the current view -->
+   <!-- O = center lOngitude of the current view -->
+-  <!-- Z = OSM Zoom value of the current view (http://wiki.openstreetmap.org/wiki/Zoom_levels) -->
++  <!-- Z = OSM Zoom value of the current view (https://wiki.openstreetmap.org/wiki/Zoom_levels) -->
+ </objects>
+diff --git a/doc/examples/goto_tools.xml b/doc/examples/goto_tools.xml
+index aded2b6..b0070e6 100644
+--- a/doc/examples/goto_tools.xml
++++ b/doc/examples/goto_tools.xml
+@@ -3,11 +3,13 @@
+   <!-- Latitude and longitude are XML elements -->
+   <object class="VikGotoXmlTool">
+     <property name="label">Geonames</property>
+-    <property name="url-format">http://ws.geonames.org/search?q=%s&amp;maxRows=1&amp;lang=es&amp;style=short</property>
++    <property name="url-format">http://ws.geonames.org/search?q=%s&amp;lang=en&amp;style=short</property>
+     <property name="lat-path">/geonames/geoname/lat</property>
+     <property name="lon-path">/geonames/geoname/lng</property>
+   </object>
+   <!-- Latitude and longitude are XML attributes -->
++  <!-- Service no longer active -->
++  <!--
+   <object class="VikGotoXmlTool">
+     <property name="label">Name finder</property>
+     <property name="url-format">http://gazetteer.openstreetmap.org/namefinder/search.xml?find=%s&amp;max=1</property>
+@@ -16,10 +18,11 @@
+     <property name="lon-path">/searchresults/named</property>
+     <property name="lon-attr">lon</property>
+   </object>
++  -->
+   <!-- Latitude and longitude are XML attributes (XPATH format) -->
+   <object class="VikGotoXmlTool">
+     <property name="label">Nominatim</property>
+-    <property name="url-format">http://nominatim.openstreetmap.org/search?q=%s&amp;format=xml</property>
++    <property name="url-format">https://nominatim.openstreetmap.org/search?q=%s&amp;format=xml</property>
+     <property name="lat-path">/searchresults/place@lat</property>
+     <property name="lon-path">/searchresults/place@lon</property>
+   </object>
+diff --git a/src/bingmapsource.c b/src/bingmapsource.c
+index 1f2acb8..e2470db 100644
+--- a/src/bingmapsource.c
++++ b/src/bingmapsource.c
+@@ -24,10 +24,19 @@
+   * The #BingMapSource class handles Bing map source.
+   * 
+   * License and term of use are available here:
+-  * http://wiki.openstreetmap.org/wiki/File:Bing_license.pdf
++  * https://wiki.openstreetmap.org/wiki/File:Bing_license.pdf
+   * 
+   * Technical details are available here:
+-  * http://msdn.microsoft.com/en-us/library/dd877180.aspx
++  * * https://learn.microsoft.com/en-us/bingmaps/
++  *
++  *********************************************
++  * Bing Maps for Enterprise is deprecated and has been retired for all free (Basic) account customers.
++  * Replaced by Azure Maps - https://learn.microsoft.com/en-us/azure/azure-maps/
++  *
++  * Although at time of writing (November 2025) aerial imagery tiles still worked,
++  *  but the copyright requests didn't
++  *
++  *********************************************
+   */
+   
+ #ifdef HAVE_CONFIG_H
+@@ -46,7 +55,7 @@
+ #include "background.h"
+ 
+ /* Format for URL */
+-#define URL_ATTR_FMT "http://dev.virtualearth.net/REST/v1/Imagery/Metadata/Aerial/0,0?zl=1&mapVersion=v1&key=%s&include=ImageryProviders&output=xml"
++#define URL_ATTR_FMT "https://dev.virtualearth.net/REST/v1/Imagery/Metadata/Aerial/0,0?zl=1&mapVersion=v1&key=%s&include=ImageryProviders&output=xml"
+ 
+ static gchar *bget_uri ( VikMapSourceDefault *self, MapCoord *src );
+ static gchar *bget_hostname ( VikMapSourceDefault *self );
+@@ -234,7 +243,7 @@ bing_map_source_class_init (BingMapSourceClass *klass)
+ static gchar *
+ compute_quad_tree(int zoom, int tilex, int tiley)
+ {
+-	/* Picked from http://trac.openstreetmap.org/browser/applications/editors/josm/plugins/slippymap/src/org/openstreetmap/josm/plugins/slippymap/SlippyMapPreferences.java?rev=24486 */
++	/* Picked from https://trac.openstreetmap.org/browser/applications/editors/josm/plugins/slippymap/src/org/openstreetmap/josm/plugins/slippymap/SlippyMapPreferences.java?rev=24486 */
+ 	gchar k[20];
+ 	int ik = 0;
+ 	int i = 0;
+@@ -540,6 +549,6 @@ bing_map_source_new_with_id (guint16 id, const gchar *label, const gchar *key)
+ 						"zoom-max", 19, // NB: Might be regionally different rather than the same across the world
+ 						"copyright", "© 2011 Microsoft Corporation and/or its suppliers",
+ 						"license", "Microsoft Bing Maps Specific",
+-						"license-url", "http://www.microsoft.com/maps/assets/docs/terms.aspx",
++						"license-url", "https://www.microsoft.com/maps/assets/docs/terms.aspx",
+ 						NULL);
+ }
+diff --git a/src/bluemarble.c b/src/bluemarble.c
+index 4efcee8..49062c3 100644
+--- a/src/bluemarble.c
++++ b/src/bluemarble.c
+@@ -32,8 +32,7 @@ void bluemarble_init ()
+ 							      "id", MAP_ID_BLUE_MARBLE,
+ 							      "name", "BlueMarble",
+ 							      "label", "BlueMarble",
+-							      "hostname", "s3.amazonaws.com",
+-							      "url", "/com.modestmaps.bluemarble/%d-r%3$d-c%2$d.jpg",
++							      "url", "https://s3.amazonaws.com/com.modestmaps.bluemarble/%d-r%3$d-c%2$d.jpg",
+ 							      "file-extension", ".jpg",
+ 							      "zoom-min", 0,
+ 							      "zoom-max", 9,
+@@ -41,8 +40,8 @@ void bluemarble_init ()
+ 							      "license", "NASA Terms of Use",
+ 							      "license-url", "https://earthobservatory.nasa.gov/Features/BlueMarble/",
+ 							      NULL));
+-  /* Credit/Copyright from: http://earthobservatory.nasa.gov/Features/BlueMarble/ */
+-  /* BlueMarble image hosting is courtesy of the Modest Maps project: http://modestmaps.com/ */
++  /* Credit/Copyright from: https://earthobservatory.nasa.gov/Features/BlueMarble/ */
++  /* BlueMarble image hosting is courtesy of the Modest Maps project: https://modestmaps.com/ */
+ 
+   maps_layer_register_map_source (bluemarble_type);
+ }
+diff --git a/src/geonames.c b/src/geonames.c
+index f7ef48b..4c35172 100644
+--- a/src/geonames.c
++++ b/src/geonames.c
+@@ -33,7 +33,7 @@
+ void geonames_init () {
+   // Goto
+   VikGotoXmlTool *geonames = VIK_GOTO_XML_TOOL ( g_object_new ( VIK_GOTO_XML_TOOL_TYPE, "label", "Geonames",
+-    "url-format", "http://api.geonames.org/search?q=%s&lang=en&style=short&username="VIK_CONFIG_GEONAMES_USERNAME,
++    "url-format", "https://api.geonames.org/search?q=%s&lang=en&style=short&username="VIK_CONFIG_GEONAMES_USERNAME,
+     "lat-path", "/geonames/geoname/lat",
+     "lon-path", "/geonames/geoname/lng",
+     "desc-path", "/geonames/geoname/toponymName",
+@@ -41,4 +41,3 @@ void geonames_init () {
+     vik_goto_register ( VIK_GOTO_TOOL ( geonames ) );
+     g_object_unref ( geonames );
+ }
+-
+diff --git a/src/geonamessearch.c b/src/geonamessearch.c
+index f4a3120..6e87bfd 100644
+--- a/src/geonamessearch.c
++++ b/src/geonamessearch.c
+@@ -26,7 +26,7 @@
+ //  ATM decided it's not essential enough to warrant putting in the preferences
+ #define GEONAMES_MAX_ENTRIES 20
+ 
+-#define GEONAMES_WIKIPEDIA_URL_FMT "http://api.geonames.org/wikipediaBoundingBoxJSON?formatted=true&north=%s&south=%s&east=%s&west=%s&lang=%s&maxRows=%d&username="VIK_CONFIG_GEONAMES_USERNAME
++#define GEONAMES_WIKIPEDIA_URL_FMT "https://api.geonames.org/wikipediaBoundingBoxJSON?formatted=true&north=%s&south=%s&east=%s&west=%s&lang=%s&maxRows=%d&username="VIK_CONFIG_GEONAMES_USERNAME
+ 
+ #define GEONAMES_FEATURE_PATTERN "\"feature\": \""
+ #define GEONAMES_LONGITUDE_PATTERN "\"lng\": "
+diff --git a/src/googlesearch.c b/src/googlesearch.c
+index 4e9a327..0133a33 100644
+--- a/src/googlesearch.c
++++ b/src/googlesearch.c
+@@ -23,12 +23,12 @@
+ 
+ #include "googlesearch.h"
+ 
+-#define GOOGLE_GOTO_URL_FMT "http://maps.google.com/maps?q=%s&output=js"
++#define GOOGLE_GOTO_URL_FMT "https://maps.google.com/maps?q=%s&output=js"
+ #define GOOGLE_GOTO_PATTERN_1 "{center:{lat:"
+ #define GOOGLE_GOTO_PATTERN_2 ",lng:"
+ #define GOOGLE_GOTO_NOT_FOUND "not understand the location"
+ 
+-static DownloadFileOptions googlesearch_options = { FALSE, FALSE, "http://maps.google.com/", 2, NULL, a_check_map_file, NULL, FALSE, FALSE, NULL };
++static DownloadFileOptions googlesearch_options = { FALSE, FALSE, "https://maps.google.com/", 2, NULL, a_check_map_file, NULL, FALSE, FALSE, NULL };
+ 
+ static void google_goto_tool_finalize ( GObject *gob );
+ 
+diff --git a/src/osm.c b/src/osm.c
+index de64c8d..8f63532 100644
+--- a/src/osm.c
++++ b/src/osm.c
+@@ -49,15 +49,14 @@ void osm_init () {
+                                 "id", MAP_ID_OSM_MAPNIK,
+                                 "label", _("OpenStreetMap (Mapnik)"),
+                                 "name", "OSM-Mapnik",
+-                                "hostname", "tile.openstreetmap.org",
+-                                "url", "/%d/%d/%d.png",
++				"url", "https://tile.openstreetmap.org/%d/%d/%d.png",
+                                 "check-file-server-time", FALSE,
+                                 "use-etag", TRUE,
+                                 "zoom-min", 0,
+                                 "zoom-max", 19,
+                                 "copyright", "© OpenStreetMap contributors",
+                                 "license", "CC-BY-SA",
+-                                "license-url", "http://www.openstreetmap.org/copyright",
++                                "license-url", "https://www.openstreetmap.org/copyright",
+                                 NULL));
+   VikMapSource *cycle_type =
+     VIK_MAP_SOURCE(g_object_new(VIK_TYPE_SLIPPY_MAP_SOURCE,
+@@ -71,37 +70,35 @@ void osm_init () {
+                                 "zoom-max", 18,
+                                 "copyright", "Tiles courtesy of Andy Allan © OpenStreetMap contributors",
+                                 "license", "CC-BY-SA",
+-                                "license-url", "http://www.openstreetmap.org/copyright",
++                                "license-url", "https://www.openstreetmap.org/copyright",
+                                 NULL));
+   VikMapSource *transport_type =
+     VIK_MAP_SOURCE(g_object_new(VIK_TYPE_SLIPPY_MAP_SOURCE,
+                                 "id", MAP_ID_OSM_TRANSPORT,
+                                 "label", _("OpenStreetMap (Transport)"),
+                                 "name", "OSM-Transport",
+-                                "hostname", "tile2.opencyclemap.org",
+-                                "url", "/transport/%d/%d/%d.png",
++				"url", "https://tile2.opencyclemap.org/transport/%d/%d/%d.png",
+                                 "check-file-server-time", TRUE,
+                                 "use-etag", FALSE,
+                                 "zoom-min", 0,
+                                 "zoom-max", 18,
+                                 "copyright", "Tiles courtesy of Andy Allan © OpenStreetMap contributors",
+                                 "license", "CC-BY-SA",
+-                                "license-url", "http://www.openstreetmap.org/copyright",
++                                "license-url", "https://www.openstreetmap.org/copyright",
+                                 NULL));
+   VikMapSource *hot_type =
+     VIK_MAP_SOURCE(g_object_new(VIK_TYPE_SLIPPY_MAP_SOURCE,
+                                 "id", MAP_ID_OSM_HUMANITARIAN,
+                                 "name", "OSM-Humanitarian",
+                                 "label", _("OpenStreetMap (Humanitarian)"),
+-                                "hostname", "c.tile.openstreetmap.fr",
+-                                "url", "/hot/%d/%d/%d.png",
++				"url", "https://c.tile.openstreetmap.fr/hot/%d/%d/%d.png",
+                                 "check-file-server-time", TRUE,
+                                 "use-etag", FALSE,
+                                 "zoom-min", 0,
+                                 "zoom-max", 20, // Super detail!!
+                                 "copyright", "© OpenStreetMap contributors. Tiles courtesy of Humanitarian OpenStreetMap Team",
+                                 "license", "CC-BY-SA",
+-                                "license-url", "http://www.openstreetmap.org/copyright",
++                                "license-url", "https://www.openstreetmap.org/copyright",
+                                 NULL));
+ 
+   // NB no cache needed for this type!!
