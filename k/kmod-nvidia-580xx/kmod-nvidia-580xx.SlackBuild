@@ -2,10 +2,11 @@
 cd $(dirname $0) ; CWD=$(pwd)
 
 APP=kmod-nvidia-580xx
+BINDIST=NVIDIA-Linux
+VERSION=${VERSION:-$(echo ${BINDIST}-*-*.run | rev | cut -d. -f2- | cut -d- -f1 | rev)}
+ARCH=$(echo ${BINDIST}-*-*.run | rev | cut -d- -f2 | rev)
 KERNSRC=${KERNSRC:-/usr/src/linux}
-BINDIST=NVIDIA-Linux-x86_64
 MODLIST="nvidia-uvm.ko nvidia-peermem.ko nvidia-drm.ko nvidia-modeset.ko nvidia.ko"
-VERSION=${VERSION:-$(echo ${BINDIST}-*.run | rev | cut -f 2- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
 TMP=${TMP:-/tmp}
@@ -20,23 +21,13 @@ else
   KERNVER=$(cat ${KERNSRC}/include/config/kernel.release)
 fi
 
-# Take architecture from kernel (for x86 only):
-if fgrep -qw "CONFIG_X86_32=y" ${KERNSRC}/.config ; then
-  ARCH="i686"
-elif fgrep -qw "CONFIG_X86_64=y" ${KERNSRC}/.config ; then
-  ARCH="x86_64"
-else
-  echo "CPU architecture other than x86 not supported."
-  exit 2
-fi
-
 PKG=$TMP/package-$APP
 rm -rf $PKG
 mkdir -p $PKG
 cd $TMP
-rm -rf $BINDIST-$VERSION
-$CWD/${BINDIST}-${VERSION}.run -x || exit 1
-cd $BINDIST-$VERSION || exit 1
+rm -rf $BINDIST-$ARCH-$VERSION
+$CWD/${BINDIST}-${ARCH}-${VERSION}.run -x || exit 1
+cd $BINDIST-$ARCH-$VERSION || exit 1
 chown -R root:root .
 find . \
   \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
@@ -93,6 +84,6 @@ makepkg -l y -c n $OUTDIR/$APP-${VERSION}_${KERNVER}-$ARCH-${BUILD}${TAG}.txz
 
 # Clean up the extra stuff:
 if [ "$1" = "--cleanup" ]; then
-  rm -rf $TMP/$BINDIST-$VERSION
+  rm -rf $TMP/$BINDIST-$ARCH-$VERSION
   rm -rf $PKG
 fi
