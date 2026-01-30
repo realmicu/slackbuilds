@@ -129,7 +129,7 @@ cp -av \
 # Version-independent libraries:
 cp -av \
   libnvidia-api.so.1 \
-  libnvidia-egl-gbm.so.1.1.2 \
+  libnvidia-egl-gbm.so.1.1.3 \
   libnvidia-egl-wayland.so.1.1.20 \
   libnvidia-egl-xcb.so.1.0.4 \
   libnvidia-egl-xlib.so.1.0.4 \
