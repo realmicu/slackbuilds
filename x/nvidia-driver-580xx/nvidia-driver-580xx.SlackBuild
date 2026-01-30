@@ -20,7 +20,7 @@ PKG=$TMP/package-$APP
 rm -rf $PKG
 mkdir -p $PKG
 cd $TMP
-rm -rf $BINDIST-$VERSION
+rm -rf $BINDIST-$ARCH-$VERSION
 $CWD/${BINDIST}-${ARCH}-${VERSION}.run -x || exit 1
 cd $BINDIST-$ARCH-$VERSION || exit 1
 chown -R root:root .
@@ -34,10 +34,12 @@ find . \
 # (source of truth is .manifest file in driver's root dir):
 mkdir -vp \
   $PKG/usr/bin \
+  $PKG/usr/sbin \
   $PKG/usr/doc/$APP-$VERSION/samples \
   $PKG/usr/lib${LIBDIRSUFFIX}/{nvidia,vdpau} \
   $PKG/usr/lib${LIBDIRSUFFIX}/xorg/modules/{drivers,extensions} \
   $PKG/usr/man/man1 \
+  $PKG/etc/modprobe.d \
   $PKG/etc/ld.so.conf.d \
   $PKG/etc/OpenCL/vendors \
   $PKG/etc/X11/xorg.conf.d \
@@ -50,7 +52,8 @@ mkdir -vp \
   $PKG/usr/share/glvnd/egl_vendor.d \
   $PKG/usr/share/nvidia/files.d \
   $PKG/usr/share/pixmaps \
-  $PKG/lib/firmware/nvidia/$VERSION
+  $PKG/lib/firmware/nvidia/$VERSION \
+  $PKG/lib${LIBDIRSUFFIX}/elogind/system-sleep
 
 # Versioned libraries:
 cp -av \
@@ -79,7 +82,6 @@ cp -av \
   libnvidia-opencl.so.$VERSION \
   libnvidia-opticalflow.so.$VERSION \
   libnvidia-pkcs11-openssl3.so.$VERSION \
-  libnvidia-pkcs11.so.$VERSION \
   libnvidia-present.so.$VERSION \
   libnvidia-ptxjitcompiler.so.$VERSION \
   libnvidia-rtcore.so.$VERSION \
@@ -200,6 +202,7 @@ cp -av \
   ln -s nvidia-installer nvidia-uninstall
 )
 chown root:root $PKG/usr/bin/nvidia-modprobe && chmod 4711 $PKG/usr/bin/nvidia-modprobe
+cp -av systemd/nvidia-sleep.sh $PKG/usr/sbin
 
 # Man pages:
 cp -av \
@@ -240,9 +243,12 @@ cp -av \
 cp -av sandboxutils-filelist.json $PKG/usr/share/nvidia/files.d
 
 # Additional custom config:
-cp -av $CWD/xorg_nvidia.conf $PKG/etc/X11/xorg.conf.d/10-nvidia.conf
-cp -av $CWD/ld_so_nvidia.conf $PKG/etc/ld.so.conf.d/nvidia.conf
-echo "#/usr/lib$LIBDIRSUFFIX/nvidia" >> $PKG/etc/ld.so.conf.d/nvidia.conf
+cp -v $CWD/xorg_nvidia.conf $PKG/etc/X11/xorg.conf.d/10-nvidia.conf.new
+cp -v $CWD/ld_so_nvidia.conf $PKG/etc/ld.so.conf.d/nvidia.conf.new
+cp -v $CWD/modprobe_nvidia.conf $PKG/etc/modprobe.d/nvidia.conf.new
+echo "#/usr/lib$LIBDIRSUFFIX/nvidia" >> $PKG/etc/ld.so.conf.d/nvidia.conf.new
+cp -v $CWD/elogind_system_sleep_nvidia $PKG/lib${LIBDIRSUFFIX}/elogind/system-sleep/nvidia && \
+  chmod 755 $PKG/lib${LIBDIRSUFFIX}/elogind/system-sleep/nvidia
 
 # Firmware:
 cp -av firmware/*.bin $PKG/lib/firmware/nvidia/$VERSION
@@ -273,7 +279,7 @@ makepkg -l y -c n $OUTDIR/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
 
 # Clean up the extra stuff:
 if [ "$1" = "--cleanup" ]; then
-  rm -rf $TMP/$BINDIST-$VERSION
+  rm -rf $TMP/$BINDIST-$ARCH-$VERSION
   rm -rf $PKG
 fi
 

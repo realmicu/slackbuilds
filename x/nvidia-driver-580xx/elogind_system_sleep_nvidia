@@ -1,0 +1,19 @@
+#!/bin/sh
+# https://www.linuxquestions.org/questions/slackware-14/current-x-no-longer-resumes-after-suspend-4175705127/page2.html#post6311002
+NVSLEEP="/usr/sbin/nvidia-sleep.sh"
+case "$1" in
+  pre)
+    case "$2" in
+      suspend|hibernate)
+        "${NVSLEEP}" "$2"
+      ;;
+    esac
+    ;;
+  post)
+    case "$2" in
+      suspend|hibernate)
+        "${NVSLEEP}" resume
+      ;;
+    esac
+  ;;
+esac
