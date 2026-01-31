@@ -12,7 +12,8 @@ case "$1" in
   post)
     case "$2" in
       suspend|hibernate)
-        "${NVSLEEP}" resume
+        sleep 1
+        "${NVSLEEP}" resume &
       ;;
     esac
   ;;
