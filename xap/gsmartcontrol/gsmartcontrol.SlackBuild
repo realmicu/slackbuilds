@@ -53,21 +53,23 @@ find . \
   \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
   -exec chmod 644 {} \+
 
-./autogen.sh || exit 1
+mkdir build && cd build || exit 1
 
-CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-./configure --prefix=/usr \
-	    --sysconfdir=/etc \
-	    --localstatedir=/var \
-	    --mandir=/usr/man \
-	    --runstatedir=/run \
-	    --libdir=/usr/lib$LIBDIRSUFFIX \
-	    --docdir=/usr/doc/$APP-$VERSION \
-	    --build=$ARCH-slackware-linux || exit 1
+cmake -DCMAKE_CXX_FLAGS="$SLKCFLAGS" \
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=/usr \
+      .. || exit 1
 
 make $NUMJOBS || exit 1
 make install DESTDIR=$PKG || exit 1
+cd .. || exit 1
+
+# Relocate man pages:
+mv $PKG/usr/share/man $PKG/usr
+
+# Relocate documentation:
+mv $PKG/usr/share/doc $PKG/usr
+mv $PKG/usr/doc/$APP $PKG/usr/doc/$APP-$VERSION
 
 # Don't ship .la files:
 rm -f $PKG/{,usr/}lib${LIBDIRSUFFIX}/*.la
@@ -119,4 +121,3 @@ if [ "$1" = "--cleanup" ]; then
   rm -rf $TMP/$APP-$VERSION
   rm -rf $PKG
 fi
-
