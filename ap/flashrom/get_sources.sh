@@ -1,9 +1,8 @@
 #!/bin/bash
-SRC=flashrom
-VERSION=1.2
-set -x
-wget -c https://download.flashrom.org/releases/${SRC}-v${VERSION}.tar.bz2 && \
-  tar xjf ${SRC}-v${VERSION}.tar.bz2 && \
-  mv ${SRC}-v${VERSION} ${SRC}-${VERSION} && \
-  tar cf - ${SRC}-${VERSION} | xz -c9 > ${SRC}-${VERSION}.tar.xz && \
-  rm -rf ${SRC}-v${VERSION}.tar.bz2 ${SRC}-${VERSION}
+set -ex
+APP=flashrom
+URL="https://review.coreboot.org/${APP}"
+VERSION="$(git ls-remote --tags --refs --sort=-v:refname $URL refs/tags/v[0-9]* | rev | cut -d/ -f1 | rev | grep -vE -- '-(rc|alpha|beta)' | head -1 | tr -d 'v')"
+git clone -b v$VERSION --single-branch $URL $APP-$VERSION
+tar cf - $APP-$VERSION | xz -c9 > $APP-$VERSION.tar.xz
+[ -s $APP-$VERSION.tar.xz ] && rm -rf $APP-$VERSION
