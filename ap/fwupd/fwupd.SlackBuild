@@ -1,0 +1,149 @@
+#!/bin/sh
+cd $(dirname $0) ; CWD=$(pwd)
+
+APP=fwupd
+VERSION=$(ls $APP-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+TMP=${TMP:-/tmp}
+OUTDIR=${OUTDIR:-$TMP}
+
+# Automatically determine the architecture we're building on:
+if [ -z "$ARCH" ]; then
+  case "$(uname -m)" in
+    i?86) ARCH=i686 ;;
+    arm*) readelf /usr/bin/file -A | grep -E -q "Tag_CPU.*[4,5]" && ARCH=arm || ARCH=armv7hl ;;
+    # Unless $ARCH is already set, use uname -m for all other archs:
+    *) ARCH=$(uname -m) ;;
+  esac
+  export ARCH
+fi
+
+if [ "$ARCH" = "i586" ]; then
+  SLKCFLAGS="-O2 -march=i586 -mtune=i686"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "i686" ]; then
+  SLKCFLAGS="-O2 -march=pentium4 -mtune=generic"
+  LIBDIRSUFFIX=""
+elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -march=x86-64 -mtune=generic -fPIC"
+  LIBDIRSUFFIX="64"
+else
+  SLKCFLAGS="-O2"
+  LIBDIRSUFFIX=""
+fi
+
+# Machine flags override (keep -O and -fPIC):
+if [ -n "$MCFLAGS" ]; then
+  SLKCFLAGS="$(echo $SLKCFLAGS | xargs -n1 | egrep -w '(-O[0-9a-z]*|-fPIC)' | xargs) $MCFLAGS"
+fi
+
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG
+cd $TMP
+rm -rf $APP-$VERSION
+tar xvf $CWD/$APP-$VERSION.tar.?z* || exit 1
+cd $APP-$VERSION || exit 1
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \+ -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \+
+
+meson setup build -Dc_args="$SLKCFLAGS" \
+	--buildtype=release \
+	--prefix=/usr \
+	--sysconfdir=/etc \
+	--localstatedir=/var \
+	--libdir=/usr/lib$LIBDIRSUFFIX \
+	--libexecdir=/usr/libexec \
+	--mandir=/usr/man \
+	-Db_lto=true \
+	-Dbuild=all \
+	-Dfirmware-packager=true \
+	-Dtests=false \
+	-Dumockdev_tests=disabled \
+	-Dgcab:docs=false \
+	-Dhsi=enabled \
+	-Dlvfs=true \
+	-Dman=true \
+	-Dpassim=disabled \
+	-Dsupported_build=enabled \
+	-Dsystemd=disabled \
+	-Dvendor_ids_dir=/usr/share/hwdata || exit 1
+
+meson compile -C build || exit 1
+DESTDIR=$PKG meson install -C build || exit 1
+
+# Config files:
+mv $PKG/etc/fwupd/fwupd.conf{,.new}
+mv $PKG/etc/fwupd/remotes.d/vendor-directory.conf{,.new}
+mv $PKG/etc/fwupd/remotes.d/lvfs-testing.conf{,.new}
+mv $PKG/etc/fwupd/remotes.d/lvfs.conf{,.new}
+mv $PKG/etc/grub.d/35_fwupd{,.new}
+
+# Rename dbxtool:
+mv $PKG/usr/bin/{,fwupd-}dbxtool
+mv $PKG/usr/man/man1/{,fwupd-}dbxtool.1
+
+# Relocate documentation:
+mv $PKG/usr/share/doc $PKG/usr
+mv $PKG/usr/doc/$APP $PKG/usr/doc/$APP-$VERSION
+rm -f $PKG/usr/doc/$APP-$VERSION/libfwupd{,plugin}
+mv $PKG/usr/doc/libfwupd{,plugin} $PKG/usr/doc/$APP-$VERSION
+cp -a CODE_OF_CONDUCT.md COMMITMENT CONTRIBUTING.md COPYING \
+  MAINTAINERS README.md RELEASE SECURITY.md \
+  $PKG/usr/doc/$APP-$VERSION
+
+# Don't ship .la files:
+rm -f $PKG/{,usr/}lib${LIBDIRSUFFIX}/*.la
+
+chown -R root:bin $PKG/usr/bin $PKG/usr/sbin
+
+( cd $PKG
+  find . | xargs file | grep "executable" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
+  find . | xargs file | grep "current ar archive" | grep ELF | cut -f 1 -d : | xargs strip -g 2> /dev/null
+)
+
+# Compress and if needed symlink the man pages:
+if [ -d $PKG/usr/info ]; then
+  rm -f $PKG/usr/info/dir
+  gzip -9 $PKG/usr/info/*
+fi
+if [ -d $PKG/usr/man ]; then
+  ( cd $PKG/usr/man
+    for manpagedir in $(find . -type d -name "man*") ; do
+      ( cd $manpagedir
+        for eachpage in $( find . -type l -maxdepth 1) ; do
+          ln -s $( readlink $eachpage ).gz $eachpage.gz
+          rm $eachpage
+        done
+        gzip -9 *.?
+      )
+    done
+  )
+fi
+
+mkdir -p $PKG/install
+[ -f $CWD/doinst.sh ] && cat $CWD/doinst.sh > $PKG/install/doinst.sh
+[ -f $CWD/doinst.sh.gz ] && zcat $CWD/doinst.sh.gz > $PKG/install/doinst.sh
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
+
+cd $PKG
+makepkg -l y -c n $OUTDIR/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $TMP/$APP-$VERSION
+  rm -rf $PKG
+fi
