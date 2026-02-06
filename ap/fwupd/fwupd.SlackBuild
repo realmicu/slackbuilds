@@ -72,6 +72,7 @@ meson setup build -Dc_args="$SLKCFLAGS" \
 	-Dpassim=disabled \
 	-Dsupported_build=enabled \
 	-Dsystemd=disabled \
+	-Defi_binary=true \
 	-Dvendor_ids_dir=/usr/share/hwdata || exit 1
 
 meson compile -C build || exit 1
