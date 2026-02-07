@@ -89,3 +89,4 @@
 	ap	pv
 	l	python-pefile			# fwupd
 	ap	fwupd
+	ap	intel-undervolt

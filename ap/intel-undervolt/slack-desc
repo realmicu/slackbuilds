@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+               |-----handy-ruler------------------------------------------------------|
+intel-undervolt: intel-undervolt (tool for undervolting Intel CPUs)
+intel-undervolt:
+intel-undervolt: This package contains a tool for undervolting and throttling limits
+intel-undervolt: alteration for Intel CPUs (if not blocked by BIOS). Undervolting works
+intel-undervolt: on Haswell and newer CPUs.
+intel-undervolt:
+intel-undervolt: This tool may damage your hardware since it uses reverse engineered
+intel-undervolt: methods of MSR usage. Use it at your own risk.
+intel-undervolt:
+intel-undervolt: URL: https://github.com/kitsunyan/intel-undervolt.git
+intel-undervolt:
