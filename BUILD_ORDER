@@ -72,7 +72,6 @@
 	i3	i3blocks			# i3wm
 	ap	vifm
 	ap	go-md2man			# podman
-	l	libslirp			# podman
 	cntr	slirp4netns			# podman
 	cntr	conmon				# podman
 	cntr	crun				# podman

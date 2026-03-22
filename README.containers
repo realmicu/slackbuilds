@@ -3,7 +3,6 @@ Container packages (in build order):
 
   l/yajl
   ap/go-md2man
-  l/libslirp
   cntr/slirp4netns
   cntr/conmon
   cntr/crun
