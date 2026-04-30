@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+                   |-----handy-ruler------------------------------------------------------|
+nvidia-vaapi-driver: nvidia-vaapi-driver (VA-API implementation for Nvidia cards)
+nvidia-vaapi-driver:
+nvidia-vaapi-driver: This is an VA-API implementation that uses NVDEC as a backend.
+nvidia-vaapi-driver: It is specifically designed to be used by Firefox for accelerated
+nvidia-vaapi-driver: decode of Web content, and may not operate correctly in other
+nvidia-vaapi-driver: applications.
+nvidia-vaapi-driver:
+nvidia-vaapi-driver: URL: https://github.com/elFarto/nvidia-vaapi-driver
+nvidia-vaapi-driver:
+nvidia-vaapi-driver:
+nvidia-vaapi-driver:
