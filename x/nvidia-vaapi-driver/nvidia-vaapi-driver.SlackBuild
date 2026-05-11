@@ -69,7 +69,7 @@ mkdir -p $PKG/etc/profile.d
 for i in csh sh ; do
   cat $CWD/libva.${i} > $PKG/etc/profile.d/libva.${i}.new && \
   chown root:root $PKG/etc/profile.d/libva.${i}.new && \
-  chmod 755 $PKG/etc/profile.d/libva.${i}a.new
+  chmod 755 $PKG/etc/profile.d/libva.${i}.new
 done
 
 mkdir -p $PKG/usr/doc/$APP-$VERSION
