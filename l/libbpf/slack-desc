@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+      |-----handy-ruler------------------------------------------------------|
+libbpf: libbpf (library for loading eBPF programs and accessing eBPF objects)
+libbpf:
+libbpf: libbpf is a C-based library containing a BPF loader that takes
+libbpf: compiled BPF object files and prepares and loads them into the Linux
+libbpf: kernel. libbpf takes the heavy lifting of loading, verifying
+libbpf: and attaching BPF programs to various kernel hooks, allowing BPF
+libbpf: application developers to focus only on BPF program correctness
+libbpf: and performance.
+libbpf:
+libbpf: URL: https://github.com/libbpf/libbpf
+libbpf:
