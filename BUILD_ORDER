@@ -89,7 +89,8 @@
 	l	python-pefile			# fwupd
 	ap	fwupd
 	ap	intel-undervolt
-	l	libbpf				# bcc
-	d	bcc
-	ap	bpftool
-	d	cereal
+	l	libbpf				# bcc,bpftrace
+	d	bcc				# bpftrace
+	ap	bpftool				# bpftrace
+	d	cereal				# bpftrace
+	ap	bpftrace

@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+        |-----handy-ruler------------------------------------------------------|
+bpftrace: bpftrace (a high-level tracing utility for eBPF)
+bpftrace:
+bpftrace: bpftrace is a high-level tracing language for Linux. bpftrace uses
+bpftrace: LLVM as a backend to compile scripts to eBPF-bytecode and makes use
+bpftrace: of libbpf and bcc for interacting with the Linux BPF subsystem, as
+bpftrace: well as existing Linux tracing capabilities.
+bpftrace: The bpftrace language is inspired by awk, C, and predecessor tracers
+bpftrace: such as DTrace and SystemTap.
+bpftrace:
+bpftrace: URL: https://github.com/bpftrace/bpftrace
+bpftrace:
