@@ -91,3 +91,4 @@
 	ap	intel-undervolt
 	l	libbpf				# bcc
 	d	bcc
+	ap	bpftool
