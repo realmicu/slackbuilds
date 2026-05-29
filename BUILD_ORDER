@@ -92,3 +92,4 @@
 	l	libbpf				# bcc
 	d	bcc
 	ap	bpftool
+	d	cereal
