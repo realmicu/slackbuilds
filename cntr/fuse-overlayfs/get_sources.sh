@@ -1,5 +1,9 @@
 #!/bin/bash
-SRC=fuse-overlayfs
-VERSION=1.11
-set -x
-wget -c -O ${SRC}-${VERSION}.tar.gz https://github.com/containers/${SRC}/archive/refs/tags/v${VERSION}.tar.gz
+set -ex
+APP="fuse-overlayfs"
+URL="https://github.com/containers/$APP"
+TAGVER="$(git ls-remote --tags --refs --sort=-v:refname $URL refs/tags/{,v}[0-9]* | rev | cut -d/ -f1 | rev | head -1)"
+VERSION="$(tr -d 'v' <<< $TAGVER)"
+git clone -b $TAGVER --single-branch --recurse-submodules $URL $APP-$VERSION
+tar cf - ${APP}-${VERSION} | xz -c9 > ${APP}-${VERSION}.tar.xz
+[ -s ${APP}-${VERSION}.tar.xz ] && rm -rf ${APP}-${VERSION}
