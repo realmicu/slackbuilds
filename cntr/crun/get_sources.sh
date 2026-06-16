@@ -1,5 +1,9 @@
 #!/bin/bash
-SRC=crun
-VERSION=1.8.4
-set -x
-wget -O ${SRC}-${VERSION}.tar.xz https://github.com/containers/${SRC}/releases/download/${VERSION}/${SRC}-${VERSION}.tar.xz
+set -ex
+APP="crun"
+URL="https://github.com/containers/$APP"
+TAGVER="$(git ls-remote --tags --refs --sort=-v:refname $URL refs/tags/[0-9]* | rev | cut -d/ -f1 | rev | head -1)"
+VERSION="$(tr -d 'v' <<< $TAGVER)"
+git clone -b $TAGVER --single-branch --recurse-submodules $URL $APP-$VERSION
+tar cf - ${APP}-${VERSION} | xz -c9 > ${APP}-${VERSION}.tar.xz
+[ -s ${APP}-${VERSION}.tar.xz ] && rm -rf ${APP}-${VERSION}
