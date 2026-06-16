@@ -1,0 +1,114 @@
+When building fwupd-efi on systems with certain versions of binutils
+(e.g. objcopy 2.46.1 from Slackware 15.1), the build fails with:
+
+  objcopy: subprojects/fwupd-efi/efi/fwup.so: file format not recognized
+
+Root cause:
+* The build passes --target efi-app-x86_64 to objcopy to create the
+  EFI PE/COFF binary from the ELF shared object fwup.so.
+* The installed objcopy does not list efi-app-x86_64 as a supported
+  output target format (run 'objcopy --info' to confirm).
+* The meson build system only checks for EFI target support on ARM,
+  AArch64, RISC-V, and LoongArch, assuming x86_64 always works.
+
+What the patch does:
+* Detects at runtime whether objcopy supports the efi-app-{arch} target
+  by parsing objcopy --info output.
+* If supported, uses the existing logic unchanged.
+* If unsupported, falls back to pei-{arch} (e.g. pei-x86_64), which
+  produces a valid PE32+ image but with Subsystem = 0 (UNKNOWN).
+* Then patches the PE optional header Subsystem byte to 10
+  (IMAGE_SUBSYSTEM_EFI_APPLICATION) so the final binary is correctly
+  identified as an EFI application.
+
+Assisted-by: OpenCode (Big Pickle OpenCode Zen)
+
+diff --git a/efi/generate_binary.py b/efi/generate_binary.py
+index 443472a..1b09766 100755
+--- a/efi/generate_binary.py
++++ b/efi/generate_binary.py
+@@ -9,9 +9,44 @@
+ 
+ import subprocess
+ import sys
++import struct
+ import argparse
+ 
+ 
++# Map gnu-efi arch names to objcopy pei-* target names
++_PEI_ARCH_MAP = {
++    "x86_64": "x86-64",
++    "ia32": "i386",
++}
++
++
++def _target_supported(objcopy, target):
++    """Check if objcopy supports a given output target format."""
++    argv = [objcopy, "--info"]
++    try:
++        output = subprocess.check_output(argv, text=True, stderr=subprocess.STDOUT)
++        return target in output
++    except (subprocess.CalledProcessError, FileNotFoundError):
++        return False
++
++
++def _fix_pe_subsystem(path):
++    """Patch PE optional header Subsystem field to
++    IMAGE_SUBSYSTEM_EFI_APPLICATION (10)."""
++    with open(path, 'r+b') as f:
++        data = f.read()
++        e_lfanew = struct.unpack_from('<I', data, 0x3c)[0]
++        # Subsystem at offset 68 in optional header:
++        #   PE sig (4) + file header (20) + opt hdr offset 68
++        subsys_offset = e_lfanew + 4 + 20 + 68
++        subsystem = struct.unpack_from('<H', data, subsys_offset)[0]
++        if subsystem != 10:
++            data = bytearray(data)
++            struct.pack_into('<H', data, subsys_offset, 10)
++            f.seek(0)
++            f.write(data)
++
++
+ def _run_objcopy(args):
+ 
+     argv = [
+@@ -38,16 +73,21 @@ def _run_objcopy(args):
+         args.outfile,
+     ]
+ 
+-    # older objcopy for Aarch64, ARM32 and RISC-V are not EFI capable.
+-    # Use "binary" instead, and add required symbols manually.
+     if args.objcopy_manualsymbols:
+         argv.extend(["-O", "binary"])
+-    elif args.os == "freebsd":
+-        # `--target` option is missing and --input-target doesn't recognize
+-        # "efi-app-*"
+-        argv.extend(["--output-target", "efi-app-{}".format(args.arch)])
+     else:
+-        argv.extend(["--target", "efi-app-{}".format(args.arch)])
++        efi_target = "efi-app-{}".format(args.arch)
++        if _target_supported(args.objcopy, efi_target):
++            prefix = "--output-target" if args.os == "freebsd" else "--target"
++            argv.extend([prefix, efi_target])
++        else:
++            pei_arch = _PEI_ARCH_MAP.get(args.arch)
++            if pei_arch is None:
++                print("objcopy has no {} target and no pei-* fallback"
++                      " for arch {}".format(efi_target, args.arch))
++                sys.exit(1)
++            argv.extend(["--output-target", "pei-{}".format(pei_arch)])
++            args._subsysfix = True
+ 
+     try:
+         subprocess.run(argv, check=True)
+@@ -55,6 +95,10 @@ def _run_objcopy(args):
+         print(str(e))
+         sys.exit(1)
+ 
++    # Patch PE subsystem if we used pei-* fallback
++    if getattr(args, '_subsysfix', False):
++        _fix_pe_subsystem(args.outfile)
++
+ 
+ def _run_genpeimg(args):
+     if not args.genpeimg:

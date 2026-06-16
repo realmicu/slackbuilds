@@ -75,6 +75,10 @@ meson setup build -Dc_args="$SLKCFLAGS" \
 	-Defi_binary=true \
 	-Dvendor_ids_dir=/usr/share/hwdata || exit 1
 
+# Workaround for 'objcopy: subprojects/fwupd-efi/efi/fwup.so: file format not recognized'.
+# 'objcopy' does not list 'efi-app-x86_64' as a supported output target for now:
+( cd subprojects/fwupd-efi && patch -p1 < $CWD/fix-efi-objcopy.patch ) || exit 1
+
 meson compile -C build || exit 1
 DESTDIR=$PKG meson install -C build || exit 1
 
