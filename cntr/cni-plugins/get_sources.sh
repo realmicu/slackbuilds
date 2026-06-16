@@ -1,10 +1,9 @@
 #!/bin/bash
-SRC=cni-plugins
-VERSION=1.2.0
-set -x
-wget -c -O ${SRC}-${VERSION}.tar.gz https://github.com/containernetworking/plugins/archive/refs/tags/v${VERSION}.tar.gz || exit 1
-tar xzf ${SRC}-${VERSION}.tar.gz && rm -f ${SRC}-${VERSION}.tar.gz
-mv plugins-${VERSION} ${SRC}-${VERSION}
-chown -R root:root ${SRC}-${VERSION} 2>/dev/null
-tar cf - ${SRC}-${VERSION} | xz -c9 > ${SRC}-${VERSION}.tar.xz
-[ -s ${SRC}-${VERSION}.tar.xz ] && rm -rf ${SRC}-${VERSION}
+set -ex
+APP="cni-plugins"
+URL="https://github.com/containernetworking/plugins"
+TAGVER="$(git ls-remote --tags --refs --sort=-v:refname $URL refs/tags/{,v}[0-9]* | rev | cut -d/ -f1 | rev | head -1)"
+VERSION="$(tr -d 'v' <<< $TAGVER)"
+git clone -b $TAGVER --single-branch --recurse-submodules $URL $APP-$VERSION
+tar cf - ${APP}-${VERSION} | xz -c9 > ${APP}-${VERSION}.tar.xz
+[ -s ${APP}-${VERSION}.tar.xz ] && rm -rf ${APP}-${VERSION}
