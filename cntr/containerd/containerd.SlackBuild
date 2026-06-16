@@ -82,6 +82,7 @@ fi
 
 # Point go to the location of the source tree
 export GOPATH="$TMP/$APP-$VERSION"
+export GOCACHE="$GOPATH/.cache/go-build"
 export CGO_CFLAGS="$SLKCFLAGS"
 export CGO_CXXFLAGS="$SLKCFLAGS"
 

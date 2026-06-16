@@ -43,6 +43,7 @@ find . \
 
 # Point go to the location of the source tree
 export GOPATH="$TMP/$APP-$VERSION"
+export GOCACHE="$GOPATH/.cache/go-build"
 export GOBIN="$PKG/usr/bin"
 
 go install -a -x ./... || exit 1

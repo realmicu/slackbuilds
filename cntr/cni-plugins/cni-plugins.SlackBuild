@@ -64,6 +64,7 @@ find . \
 
 # Point go to the location of the source tree
 export GOPATH="$TMP/$APP-$VERSION"
+export GOCACHE="$GOPATH/.cache/go-build"
 REPO_PATH=$TMP/$APP-$VERSION/src/$DOMAIN/$ORG/$REPONAME
 mkdir -p $PKG/usr/libexec/cni
 
