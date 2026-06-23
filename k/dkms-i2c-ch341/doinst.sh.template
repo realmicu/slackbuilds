@@ -1,0 +1,5 @@
+# If DKMS is present, activate freshly installed module
+# for current kernel (dkms also runs depmod internally):
+if [ -x usr/sbin/dkms ] ; then
+  chroot . /usr/sbin/dkms install --force -m @@MODULE@@ -v @@VERSION@@
+fi

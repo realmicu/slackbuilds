@@ -1,0 +1,57 @@
+#!/bin/bash
+
+# Copyright 2025 Christoph Willing,  Sydney Australia
+# Copyright 2026 Patrick J. Volkerding, Sebeka, Minnesota, USA
+# Copyright 2026 Michal Cieslakiewicz, Warsaw, Poland
+# All rights reserved
+#
+# Redistribution and use of this script, with or without modification, is
+# permitted provided that the following conditions are met:
+#
+# 1. Redistributions of this script must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
+#  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+#  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
+#  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+#  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+#  OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+#  WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+#  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# If module has been installed for a previous kernel version, update it 
+# for new kernel.
+#
+# Requires: dkms
+
+[ -z $KERNEL_VERSION ] && {
+  echo "  No KERNEL_VERSION provided. Exiting now."
+  exit
+}
+
+MODULE_NAME="@@MODULE@@"
+
+echo "Checking status of ${MODULE_NAME} kernel module..."
+
+if [ -x /usr/sbin/dkms ]; then
+  # Find existing module
+  DKMS_MODULE="$(dkms status | grep ${MODULE_NAME} | tail -1 | cut -d',' -f1 | cut -d: -f1)"
+  # If there is a previously installed module
+  if [ x"${DKMS_MODULE}" = "x" ]; then
+    echo "  No DKMS installed ${MODULE_NAME} kernel module found."
+  else
+    echo "  Found kernel module ${DKMS_MODULE}."
+    # Is it already installed for this kernel version?
+    if [ "$(dkms status -m ${DKMS_MODULE} -k $KERNEL_VERSION | cut -d' ' -f4)" = "installed" ]; then
+      # Nothing to do
+      echo "  Module ${DKMS_MODULE} is already installed for kernel $KERNEL_VERSION."
+    else
+      # Update kernel module for new kernel version
+      echo "  Installing module ${DKMS_MODULE} for kernel version $KERNEL_VERSION:"
+      dkms install ${DKMS_MODULE} -k $KERNEL_VERSION
+    fi
+  fi
+fi

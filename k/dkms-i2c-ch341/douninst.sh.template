@@ -1,0 +1,8 @@
+# This script is called AFTER source removal, so 'dkms remove'
+# will not work. We have to manually unregister module:
+for i in etc/dkms/framework.conf etc/dkms/framework.conf.d/*.conf; do
+  [ -f "$i" ] && . "$i"
+done
+rm -rf var/lib/dkms/@@MODULE@@
+rm -fv lib/modules/*/@@DESTDIR@@/@@MODULE@@.ko
+chroot . /sbin/depmod -a

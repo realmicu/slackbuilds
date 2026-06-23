@@ -1,0 +1,74 @@
+#!/bin/sh
+cd $(dirname $0) ; CWD=$(pwd)
+
+SRC=i2c-ch341
+APP=dkms-${SRC}
+ARCH=${ARCH:-noarch}
+VERSION=${VERSION:-$(echo $SRC-*.tar.?z* | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
+BUILD=${BUILD:-1}
+TAG=${TAG:-micu}
+TMP=${TMP:-/tmp}
+OUTDIR=${OUTDIR:-$TMP}
+
+MOD=${SRC}
+DESTDIR="kernel/drivers/i2c/busses"
+
+set -eo pipefail
+PKG=$TMP/package-$APP
+rm -rf $PKG
+mkdir -p $PKG/usr/src
+cd $PKG/usr/src
+tar xvf $CWD/$SRC-$VERSION.tar.?z*
+cd $SRC-$VERSION
+rm -rf .git
+chown -R root:root .
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \+ -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \+
+
+# Patch Makefile to accept external kernel source directory parameter:
+sed -i -e 's/^\(KERNEL_DIR\) :=/\1 \?=/' Makefile
+
+# Generate dkms configuration file:
+sed -e "s:@@MODULE@@:$MOD:g" \
+  -e "s:@@VERSION@@:$VERSION:g" \
+  -e "s:@@DESTDIR@@:$DESTDIR:g" \
+  $CWD/dkms.conf.template > dkms.conf
+
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# Generate doinst.sh and douninst.sh files:
+for i in doinst.sh douninst.sh ; do
+sed -e "s:@@MODULE@@:$MOD:g" \
+  -e "s:@@VERSION@@:$VERSION:g" \
+  -e "s:@@DESTDIR@@:$DESTDIR:g" \
+  $CWD/${i}.template > $PKG/install/$i
+done
+
+# If geninitrd pre-install hook template is available, use it:
+if [ -f "$CWD/geninitrd-pre-install.template" ] ; then
+  mkdir -p $PKG/etc/geninitrd.d/pre-install
+  sed -e "s:@@MODULE@@:$MOD:g" \
+    -e "s:@@VERSION@@:$VERSION:g" \
+    -e "s:@@DESTDIR@@:$DESTDIR:g" \
+    $CWD/geninitrd-pre-install.template > $PKG/etc/geninitrd.d/pre-install/dkms-$MOD
+  chmod 755 $PKG/etc/geninitrd.d/pre-install/dkms-$MOD
+fi
+
+# Allow to run as non-root until now:
+if [ $(id -u) -ne 0 ]; then
+  echo "*** Running as non-root, skipping makepkg."
+  echo "*** Package contents is in $PKG directory."
+  exit 0
+fi
+
+cd $PKG
+makepkg -l y -c n $OUTDIR/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
+
+# Clean up the extra stuff:
+if [ "$1" = "--cleanup" ]; then
+  rm -rf $PKG
+fi
