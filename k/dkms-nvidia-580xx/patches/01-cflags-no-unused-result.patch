@@ -1,0 +1,12 @@
+diff --git a/kernel/Kbuild b/kernel/Kbuild
+index 3dbc2ab..23b7837 100644
+--- a/kernel/Kbuild
++++ b/kernel/Kbuild
+@@ -79,6 +79,7 @@ ccflags-y += -I$(src)/common/inc
+ ccflags-y += -I$(src)
+ ccflags-y += -Wall $(DEFINES) $(INCLUDES) -Wno-cast-qual -Wno-format-extra-args
+ ccflags-y += -Wno-expansion-to-defined
++ccflags-y += -Wno-unused-result
+ ccflags-y += -D__KERNEL__ -DMODULE -DNVRM
+ ccflags-y += -DNV_VERSION_STRING=\"580.126.09\"
+ 

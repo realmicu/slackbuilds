@@ -1,0 +1,21 @@
+
+Nvidia legacy binary driver (580.xx series) is included
+in this tree.  It is split into two packages (listed
+in build order):
+
+  x/nvidia-driver-580xx
+
+  This package contains user-space part of proprietary
+  Nvidia driver: libraries, binaries, config files and
+  X.org support - basically everything besides kernel
+  integration.
+
+  k/kmod-nvidia-580xx
+         OR
+  k/dkms-nvidia-580xx
+
+  Above packages carry kernel modules for Nvidia GPUs.
+  Slackware-current introduced DKMS in June 2026 - for
+  recent deployments 'dkms' version is recommended.
+  For older releases please use 'kmod' flavour.
+
