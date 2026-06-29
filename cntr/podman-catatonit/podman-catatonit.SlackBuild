@@ -1,9 +1,8 @@
 #!/bin/sh
 cd $(dirname $0) ; CWD=$(pwd)
 
-SRC=catatonit
-APP=podman-${SRC}
-VERSION=$(ls $SRC-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
+APP=podman-catatonit
+VERSION=$(ls $APP-*.tar.?z* | sed -e 's/\.tar\..z.*//' | rev | cut -d- -f1 | rev)
 BUILD=${BUILD:-1}
 TAG=${TAG:-micu}
 TMP=${TMP:-/tmp}
@@ -44,9 +43,9 @@ PKG=$TMP/package-$APP
 rm -rf $PKG
 mkdir -p $PKG
 cd $TMP
-rm -rf $SRC-$VERSION
-tar xvf $CWD/$SRC-$VERSION.tar.?z* || exit 1
-cd $SRC-$VERSION || exit 1
+rm -rf $APP-$VERSION
+tar xvf $CWD/$APP-$VERSION.tar.?z* || exit 1
+cd $APP-$VERSION || exit 1
 chown -R root:root .
 find . \
   \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
@@ -122,7 +121,7 @@ makepkg -l y -c n $OUTDIR/$APP-$VERSION-$ARCH-${BUILD}${TAG}.txz
 
 # Clean up the extra stuff:
 if [ "$1" = "--cleanup" ]; then
-  rm -rf $TMP/$SRC-$VERSION
+  rm -rf $TMP/$APP-$VERSION
   rm -rf $PKG
 fi
 
