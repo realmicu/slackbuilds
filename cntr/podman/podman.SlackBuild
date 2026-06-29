@@ -109,7 +109,7 @@ export CGO_CXXFLAGS="$SLKCFLAGS"
 make $NUMJOBS all PREFIX="/usr" ETCDIR="/etc" MANDIR="/usr/man" || exit 1
 make install install.completions DESTDIR="$PKG" PREFIX="/usr" ETCDIR="/etc" MANDIR="/usr/man" || exit 1
 
-rm -rf $PKG/usr/lib/systemd $PKG/usr/lib/tmpfiles.d
+rm -rf $PKG/usr/lib/systemd $PKG/usr/lib/tmpfiles.d $PKG/usr/man/man5/podman-systemd.unit.5
 rmdir $PKG/usr/lib
 
 mkdir -p $PKG/etc/containers $PKG/etc/cni/net.d $PKG/etc/modprobe.d
@@ -119,6 +119,7 @@ sed -e 's:^#cgroup_manager = "systemd":cgroup_manager = "cgroupfs":' \
   -e 's:^#events_logger = "journald":events_logger = "file":' \
   -e 's:^#seccomp_profile = "/usr/share/containers/seccomp.json":seccomp_profile = "/etc/containers/seccomp.json":' \
   -e 's:^#network_backend = "":network_backend = "cni":' \
+  -e 's:^#default_rootless_network_cmd = ".*":default_rootless_network_cmd = "slirp4netns":' \
   vendor/$DOMAIN/$ORG/common/pkg/config/containers.conf > $PKG/etc/containers/containers.conf.new
 
 cp -v vendor/$DOMAIN/$ORG/storage/storage.conf $PKG/etc/containers/storage.conf.new
