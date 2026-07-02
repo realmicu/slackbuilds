@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Script for easy building of Slackware packages from source
+# using SlackBuilds scripts.
+# It does not require switching to root for all chown/chmod tasks.
+#
+# Author: Michal "Micu" Cieslakiewicz
+#
+# v1.0, June 2026
+# v1.5, July 2026
+#
+
+TMP="${TMP:-/tmp}"
+UNSHARECMD="unshare --user --map-auto --map-root-user --pid --fork --mount-proc -- bash --login"
+
+if [ $# -eq 0 ] ; then
+  echo ""
+  echo "Usage:"
+  echo "    $(basename $0) {dir/pkgname[@BUILD]} ..."
+  echo ""
+  echo "Example: $(basename $0) /usr/src/slackware64/ap/qemu ./src/extra/foo@5"
+  echo ""
+  echo "Package output directory (TMP) : $TMP"
+  echo ""
+  exit 0
+fi
+
+[ -d "$TMP" ] || mkdir -vp $TMP
+
+for i in $* ; do
+  APPDIR="$(cut -d@ -f1 <<< $i)"
+  SLKBLDS="$(cd $APPDIR ; A=$(pwd | rev | cut -d/ -f1 | rev) ; \
+	     if [ -f ${A}.SlackBuild ] ; then echo ${A}.SlackBuild ; else \
+	     ls *.SlackBuild ; fi)"
+  BUILD="$(fgrep -q '@' <<< $i && cut -d@ -f2 <<< $i)"
+  [ -z "$BUILD" ] && BUILD="1"
+  if [ -n "$SLKBLDS" ] ; then
+    $UNSHARECMD -s <<-EOF
+	set -eo pipefail
+	cd $APPDIR
+	export TMP=$TMP
+	export BUILD=$BUILD
+	for s in $SLKBLDS ; do [ -x ./\$s ] && ./\$s --cleanup ; done
+	exit
+	EOF
+  fi
+done
