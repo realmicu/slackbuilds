@@ -54,8 +54,8 @@ if [ -f "$CWD/geninitrd-pre-install.template" ] ; then
   sed -e "s:@@MODULE@@:$MOD:g" \
     -e "s:@@VERSION@@:$VERSION:g" \
     -e "s:@@DESTDIR@@:$DESTDIR:g" \
-    $CWD/geninitrd-pre-install.template > $PKG/etc/geninitrd.d/pre-install/dkms-$MOD
-  chmod 755 $PKG/etc/geninitrd.d/pre-install/dkms-$MOD
+    $CWD/geninitrd-pre-install.template > $PKG/etc/geninitrd.d/pre-install/dkms-${MOD}.sh
+  chmod 755 $PKG/etc/geninitrd.d/pre-install/dkms-${MOD}.sh
 fi
 
 # Allow to run as non-root until now:
