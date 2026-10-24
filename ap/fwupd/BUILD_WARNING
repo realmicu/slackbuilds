@@ -1,4 +1,0 @@
-Always rebuild on a system WITHOUT fwupd already installed.
-Otherwise setup will detect 'jcat' coming from existing installation,
-use it instead of building its own version and will not include it
-in the new package.

@@ -86,8 +86,6 @@
 	n	mosquitto
 	ap	nmon
 	ap	pv
-	l	python-pefile			# fwupd
-	ap	fwupd
 	ap	intel-undervolt
 	l	libbpf				# bcc,bpftrace
 	d	bcc				# bpftrace
